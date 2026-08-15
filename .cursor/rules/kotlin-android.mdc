@@ -1,0 +1,13 @@
+---
+description: Kotlin and Android conventions for GPS da Vida
+globs: "**/*.{kt,kts}"
+alwaysApply: false
+---
+
+# Kotlin / Android
+
+- Packages and identifiers in English; UI copy in Portuguese
+- Layers: `domain` → `data` → `ui`
+- Hilt for DI; Room only in `data`; Navigation Compose in `ui`
+- Prefer immutable models; planned vs actual time as separate fields
+- One `:app` module with those packages until an ADR says otherwise

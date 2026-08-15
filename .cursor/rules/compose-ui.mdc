@@ -1,0 +1,23 @@
+---
+description: Compose UI conventions for GPS da Vida (Agora, Meu Dia, no planning in UI)
+globs: "**/ui/**/*.kt,**/presentation/**/*.kt"
+alwaysApply: false
+---
+
+# UI Compose
+
+Composables render state. ViewModels call use cases only.
+
+```kotlin
+// BAD
+@Composable
+fun AgoraScreen(dao: ActivityDao) { /* query + reschedule */ }
+
+// GOOD
+@Composable
+fun AgoraScreen(state: AgoraUiState, onComplete: () -> Unit) { /* ... */ }
+```
+
+- Material 3; user-facing strings in Portuguese
+- Agora: one current activity, next/later without clutter, complete in one tap
+- No Room, no day-route engine in UI

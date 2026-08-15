@@ -1,0 +1,24 @@
+---
+description: Keep GPS da Vida domain as pure Kotlin with no Android dependencies
+globs: "**/domain/**/*.kt"
+alwaysApply: false
+---
+
+# Pureza do domínio
+
+`domain` is JVM Kotlin only.
+
+```kotlin
+// BAD
+import android.content.Context
+import androidx.room.Entity
+import androidx.compose.runtime.Immutable
+
+// GOOD
+data class TaskId(val value: String)
+class GenerateDayAgenda(private val clock: Clock) { /* ... */ }
+```
+
+- No Compose, Room, Resources, or `Context`
+- Inject `Clock`; do not call `now()` on the system clock
+- UI and data depend on domain, never the reverse
