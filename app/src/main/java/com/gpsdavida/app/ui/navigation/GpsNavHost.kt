@@ -2,6 +2,7 @@ package com.gpsdavida.app.ui.navigation
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
@@ -27,13 +28,20 @@ import com.gpsdavida.app.ui.agora.AgoraScreen
 import com.gpsdavida.app.ui.events.EventFormScreen
 import com.gpsdavida.app.ui.events.EventsListScreen
 import com.gpsdavida.app.ui.meudia.MeuDiaScreen
+import com.gpsdavida.app.ui.tasks.TaskFormScreen
+import com.gpsdavida.app.ui.tasks.TasksListScreen
 
 @Composable
 fun GpsNavHost() {
     val navController = rememberNavController()
     val backStack by navController.currentBackStackEntryAsState()
     val currentRoute = backStack?.destination?.route
-    val showBar = currentRoute in setOf(GpsRoutes.AGORA, GpsRoutes.MEU_DIA, GpsRoutes.EVENTS)
+    val showBar = currentRoute in setOf(
+        GpsRoutes.AGORA,
+        GpsRoutes.MEU_DIA,
+        GpsRoutes.EVENTS,
+        GpsRoutes.TASKS,
+    )
 
     Scaffold(
         bottomBar = {
@@ -57,6 +65,12 @@ fun GpsNavHost() {
                         icon = { Icon(Icons.Filled.List, contentDescription = null) },
                         label = { Text(stringResource(R.string.nav_eventos)) },
                     )
+                    NavigationBarItem(
+                        selected = currentRoute == GpsRoutes.TASKS,
+                        onClick = { navController.navigateToTab(GpsRoutes.TASKS) },
+                        icon = { Icon(Icons.Filled.Check, contentDescription = null) },
+                        label = { Text(stringResource(R.string.nav_tarefas)) },
+                    )
                 }
             }
         },
@@ -71,6 +85,7 @@ fun GpsNavHost() {
                 MeuDiaScreen(
                     onAddEvent = { navController.navigate(GpsRoutes.eventEditor()) },
                     onOpenEvent = { id -> navController.navigate(GpsRoutes.eventEditor(id)) },
+                    onOpenTask = { id -> navController.navigate(GpsRoutes.taskEditor(id)) },
                 )
             }
             composable(GpsRoutes.EVENTS) {
@@ -79,11 +94,23 @@ fun GpsNavHost() {
                     onOpen = { id -> navController.navigate(GpsRoutes.eventEditor(id)) },
                 )
             }
+            composable(GpsRoutes.TASKS) {
+                TasksListScreen(
+                    onAdd = { navController.navigate(GpsRoutes.taskEditor()) },
+                    onOpen = { id -> navController.navigate(GpsRoutes.taskEditor(id)) },
+                )
+            }
             composable(
                 route = GpsRoutes.EVENT_EDITOR,
                 arguments = listOf(navArgument("eventId") { type = NavType.StringType }),
             ) {
                 EventFormScreen(onDone = { navController.popBackStack() })
+            }
+            composable(
+                route = GpsRoutes.TASK_EDITOR,
+                arguments = listOf(navArgument("taskId") { type = NavType.StringType }),
+            ) {
+                TaskFormScreen(onDone = { navController.popBackStack() })
             }
         }
     }

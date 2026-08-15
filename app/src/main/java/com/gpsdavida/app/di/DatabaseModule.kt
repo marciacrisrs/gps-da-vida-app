@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.gpsdavida.app.data.local.AppMetaDao
 import com.gpsdavida.app.data.local.EventDao
 import com.gpsdavida.app.data.local.GpsDatabase
+import com.gpsdavida.app.data.local.TaskDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,4 +29,7 @@ object DatabaseModule {
 
     @Provides
     fun provideEventDao(database: GpsDatabase): EventDao = database.eventDao()
+
+    @Provides
+    fun provideTaskDao(database: GpsDatabase): TaskDao = database.taskDao()
 }

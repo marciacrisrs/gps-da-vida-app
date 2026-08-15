@@ -19,15 +19,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gpsdavida.app.R
 import com.gpsdavida.app.ui.events.EventRow
+import com.gpsdavida.app.ui.tasks.TaskRow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MeuDiaScreen(
     onAddEvent: () -> Unit,
     onOpenEvent: (String) -> Unit,
+    onOpenTask: (String) -> Unit,
     viewModel: MeuDiaViewModel = hiltViewModel(),
 ) {
-    val events by viewModel.events.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     Scaffold(
         topBar = { TopAppBar(title = { Text(stringResource(R.string.nav_meu_dia)) }) },
         floatingActionButton = {
@@ -36,15 +38,35 @@ fun MeuDiaScreen(
             }
         },
     ) { padding ->
-        if (events.isEmpty()) {
-            Text(
-                text = stringResource(R.string.meu_dia_empty),
-                modifier = Modifier.padding(padding).padding(24.dp),
-            )
-        } else {
-            Column(modifier = Modifier.padding(padding)) {
-                events.forEach { event ->
-                    EventRow(event = event, onClick = { onOpenEvent(event.id.value) })
+        val empty = state.events.isEmpty() && state.tasks.isEmpty()
+        Column(modifier = Modifier.padding(padding)) {
+            if (empty) {
+                Text(
+                    text = stringResource(R.string.meu_dia_empty),
+                    modifier = Modifier.padding(24.dp),
+                )
+            } else {
+                if (state.events.isNotEmpty()) {
+                    Text(
+                        text = stringResource(R.string.nav_eventos),
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    )
+                    state.events.forEach { event ->
+                        EventRow(event = event, onClick = { onOpenEvent(event.id.value) })
+                    }
+                }
+                if (state.tasks.isNotEmpty()) {
+                    Text(
+                        text = stringResource(R.string.nav_tarefas),
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    )
+                    state.tasks.forEach { task ->
+                        TaskRow(
+                            task = task,
+                            onClick = { onOpenTask(task.id.value) },
+                            onToggleDone = { viewModel.setTaskDone(task.id.value, it) },
+                        )
+                    }
                 }
             }
         }
