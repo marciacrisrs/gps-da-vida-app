@@ -9,7 +9,7 @@ Márcia decides product. The Android architect orchestrates. Other agents stay i
 
 ## Work order
 
-Architecture: [docs/adr/001-arquitetura-inicial.md](../../docs/adr/001-arquitetura-inicial.md). Next: GitHub **#18** (app skeleton) → **#1** (domain).
+Architecture: [docs/adr/001-arquitetura-inicial.md](../../docs/adr/001-arquitetura-inicial.md). Next: GitHub **#1** (domain model) after **#18** lands.
 
 ## Protocol
 

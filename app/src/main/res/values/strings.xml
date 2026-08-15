@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">GPS da Vida</string>
+    <string name="nav_agora">Agora</string>
+    <string name="nav_meu_dia">Meu Dia</string>
+    <string name="agora_placeholder">A rota do dia aparece aqui.</string>
+    <string name="meu_dia_placeholder">A timeline do dia aparece aqui.</string>
+</resources>
