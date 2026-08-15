@@ -31,10 +31,21 @@ data class Task(
     val plannedDuration: Duration,
     val priority: Priority,
     val due: Instant? = null,
+    val completedAt: Instant? = null,
     val energy: Energy? = null,
     val goalId: GoalId? = null,
 ) {
     val flexibility: Flexibility get() = Flexibility.FLEXIBLE
+
+    val isDone: Boolean get() = completedAt != null
+
+    fun belongsOnDay(date: LocalDate, zone: ZoneId): Boolean {
+        if (completedAt != null) {
+            return completedAt.atZone(zone).toLocalDate() == date
+        }
+        val dueDate = due?.atZone(zone)?.toLocalDate() ?: return false
+        return !dueDate.isAfter(date)
+    }
 }
 
 data class Habit(
