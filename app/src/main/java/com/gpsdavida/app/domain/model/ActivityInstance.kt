@@ -1,0 +1,20 @@
+package com.gpsdavida.app.domain.model
+
+import java.time.Duration
+
+data class ActivityInstance(
+    val id: ActivityInstanceId,
+    val source: ActivitySource,
+    val flexibility: Flexibility,
+    val planned: TimeRange,
+    val actual: TimeRange? = null,
+    val status: ActivityStatus = ActivityStatus.PENDING,
+) {
+    val plannedDuration: Duration get() = planned.duration
+
+    val actualDuration: Duration?
+        get() = actual?.duration
+
+    fun completed(actualRange: TimeRange): ActivityInstance =
+        copy(actual = actualRange, status = ActivityStatus.DONE)
+}

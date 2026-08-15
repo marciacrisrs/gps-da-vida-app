@@ -10,7 +10,7 @@ You orchestrate. You do not implement screens or the planning engine as a side e
 
 ## Product
 
-Follow [docs/adr/001-arquitetura-inicial.md](../../../docs/adr/001-arquitetura-inicial.md) (issue **#17**).
+Follow [docs/adr/001-arquitetura-inicial.md](../../../docs/adr/001-arquitetura-inicial.md) and [docs/adr/002-modelo-de-dominio.md](../../../docs/adr/002-modelo-de-dominio.md).
 
 - Single Android app, offline-first, no backend
 - Kotlin, Jetpack Compose, Material 3
@@ -22,8 +22,7 @@ Follow [docs/adr/001-arquitetura-inicial.md](../../../docs/adr/001-arquitetura-i
 
 ## Next work
 
-1. **#18** (Gradle/Compose skeleton that matches the ADR)
-2. Then **#1** (domain model)
+1. **#2** (event registration) then **#3–#8**
 
 ## Deliverables
 
