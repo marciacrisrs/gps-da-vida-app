@@ -1,0 +1,14 @@
+package com.gpsdavida.app.data.local
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "events")
+data class EventEntity(
+    @PrimaryKey val id: String,
+    val title: String,
+    val startEpochMilli: Long,
+    val endEpochMilli: Long,
+    val recurrenceDays: String,
+    val priority: String,
+)

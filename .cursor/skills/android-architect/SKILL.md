@@ -22,7 +22,7 @@ Follow [docs/adr/001-arquitetura-inicial.md](../../../docs/adr/001-arquitetura-i
 
 ## Next work
 
-1. **#2** (event registration) then **#3–#8**
+1. **#3** (task registration) then **#4–#8**
 
 ## Deliverables
 

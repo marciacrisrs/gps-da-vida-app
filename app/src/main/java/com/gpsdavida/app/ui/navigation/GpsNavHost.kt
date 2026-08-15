@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -15,12 +16,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.gpsdavida.app.R
 import com.gpsdavida.app.ui.agora.AgoraScreen
+import com.gpsdavida.app.ui.events.EventFormScreen
+import com.gpsdavida.app.ui.events.EventsListScreen
 import com.gpsdavida.app.ui.meudia.MeuDiaScreen
 
 @Composable
@@ -28,22 +33,31 @@ fun GpsNavHost() {
     val navController = rememberNavController()
     val backStack by navController.currentBackStackEntryAsState()
     val currentRoute = backStack?.destination?.route
+    val showBar = currentRoute in setOf(GpsRoutes.AGORA, GpsRoutes.MEU_DIA, GpsRoutes.EVENTS)
 
     Scaffold(
         bottomBar = {
-            NavigationBar {
-                NavigationBarItem(
-                    selected = currentRoute == GpsRoutes.AGORA,
-                    onClick = { navController.navigateToTab(GpsRoutes.AGORA) },
-                    icon = { Icon(Icons.Filled.Home, contentDescription = null) },
-                    label = { Text(stringResource(R.string.nav_agora)) },
-                )
-                NavigationBarItem(
-                    selected = currentRoute == GpsRoutes.MEU_DIA,
-                    onClick = { navController.navigateToTab(GpsRoutes.MEU_DIA) },
-                    icon = { Icon(Icons.Filled.DateRange, contentDescription = null) },
-                    label = { Text(stringResource(R.string.nav_meu_dia)) },
-                )
+            if (showBar) {
+                NavigationBar {
+                    NavigationBarItem(
+                        selected = currentRoute == GpsRoutes.AGORA,
+                        onClick = { navController.navigateToTab(GpsRoutes.AGORA) },
+                        icon = { Icon(Icons.Filled.Home, contentDescription = null) },
+                        label = { Text(stringResource(R.string.nav_agora)) },
+                    )
+                    NavigationBarItem(
+                        selected = currentRoute == GpsRoutes.MEU_DIA,
+                        onClick = { navController.navigateToTab(GpsRoutes.MEU_DIA) },
+                        icon = { Icon(Icons.Filled.DateRange, contentDescription = null) },
+                        label = { Text(stringResource(R.string.nav_meu_dia)) },
+                    )
+                    NavigationBarItem(
+                        selected = currentRoute == GpsRoutes.EVENTS,
+                        onClick = { navController.navigateToTab(GpsRoutes.EVENTS) },
+                        icon = { Icon(Icons.Filled.List, contentDescription = null) },
+                        label = { Text(stringResource(R.string.nav_eventos)) },
+                    )
+                }
             }
         },
     ) { padding ->
@@ -53,7 +67,24 @@ fun GpsNavHost() {
             modifier = Modifier.padding(padding),
         ) {
             composable(GpsRoutes.AGORA) { AgoraScreen() }
-            composable(GpsRoutes.MEU_DIA) { MeuDiaScreen() }
+            composable(GpsRoutes.MEU_DIA) {
+                MeuDiaScreen(
+                    onAddEvent = { navController.navigate(GpsRoutes.eventEditor()) },
+                    onOpenEvent = { id -> navController.navigate(GpsRoutes.eventEditor(id)) },
+                )
+            }
+            composable(GpsRoutes.EVENTS) {
+                EventsListScreen(
+                    onAdd = { navController.navigate(GpsRoutes.eventEditor()) },
+                    onOpen = { id -> navController.navigate(GpsRoutes.eventEditor(id)) },
+                )
+            }
+            composable(
+                route = GpsRoutes.EVENT_EDITOR,
+                arguments = listOf(navArgument("eventId") { type = NavType.StringType }),
+            ) {
+                EventFormScreen(onDone = { navController.popBackStack() })
+            }
         }
     }
 }
