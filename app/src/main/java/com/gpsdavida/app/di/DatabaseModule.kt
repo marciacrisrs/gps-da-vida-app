@@ -3,6 +3,7 @@ package com.gpsdavida.app.di
 import android.content.Context
 import androidx.room.Room
 import com.gpsdavida.app.data.local.AppMetaDao
+import com.gpsdavida.app.data.local.EventDao
 import com.gpsdavida.app.data.local.GpsDatabase
 import dagger.Module
 import dagger.Provides
@@ -19,8 +20,12 @@ object DatabaseModule {
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): GpsDatabase =
         Room.databaseBuilder(context, GpsDatabase::class.java, "gps-da-vida.db")
+            .fallbackToDestructiveMigration(true)
             .build()
 
     @Provides
     fun provideAppMetaDao(database: GpsDatabase): AppMetaDao = database.appMetaDao()
+
+    @Provides
+    fun provideEventDao(database: GpsDatabase): EventDao = database.eventDao()
 }

@@ -3,7 +3,9 @@ package com.gpsdavida.app.domain.model
 import java.time.DayOfWeek
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalTime
+import java.time.ZoneId
 
 data class Event(
     val id: EventId,
@@ -15,6 +17,12 @@ data class Event(
     val goalId: GoalId? = null,
 ) {
     val flexibility: Flexibility get() = Flexibility.FIXED
+
+    fun occursOn(date: LocalDate, zone: ZoneId): Boolean {
+        val startDate = range.start.atZone(zone).toLocalDate()
+        if (recurrenceDays.isEmpty()) return date == startDate
+        return !date.isBefore(startDate) && date.dayOfWeek in recurrenceDays
+    }
 }
 
 data class Task(
