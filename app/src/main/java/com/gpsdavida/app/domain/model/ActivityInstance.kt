@@ -15,6 +15,10 @@ data class ActivityInstance(
     val actualDuration: Duration?
         get() = actual?.duration
 
+    /** Signed difference: actual duration minus planned duration. */
+    val durationVariance: Duration?
+        get() = actualDuration?.minus(plannedDuration)
+
     fun completed(actualRange: TimeRange): ActivityInstance =
         copy(actual = actualRange, status = ActivityStatus.DONE)
 }
