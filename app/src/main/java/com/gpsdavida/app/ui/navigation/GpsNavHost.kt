@@ -74,10 +74,18 @@ fun GpsNavHost() {
             composable(GpsRoutes.TASKS) { TasksListScreen({ navController.navigate(GpsRoutes.taskEditor()) }, { navController.navigate(GpsRoutes.taskEditor(it)) }) }
             composable(GpsRoutes.HABITS) { HabitsListScreen({ navController.navigate(GpsRoutes.habitEditor()) }, { navController.navigate(GpsRoutes.habitEditor(it)) }) }
             composable(GpsRoutes.ROUTINES) { RoutinesListScreen({ navController.navigate(GpsRoutes.routineEditor()) }, { navController.navigate(GpsRoutes.routineEditor(it)) }) }
-            composable(GpsRoutes.EVENT_EDITOR, arguments = listOf(navArgument("eventId") { type = NavType.StringType })) { EventFormScreen { navController.popBackStack() } }
-            composable(GpsRoutes.TASK_EDITOR, arguments = listOf(navArgument("taskId") { type = NavType.StringType })) { TaskFormScreen { navController.popBackStack() } }
-            composable(GpsRoutes.HABIT_EDITOR, arguments = listOf(navArgument("habitId") { type = NavType.StringType })) { HabitFormScreen { navController.popBackStack() } }
-            composable(GpsRoutes.ROUTINE_EDITOR, arguments = listOf(navArgument("routineId") { type = NavType.StringType })) { RoutineFormScreen { navController.popBackStack() } }
+            composable(GpsRoutes.EVENT_EDITOR, arguments = listOf(navArgument("eventId") { type = NavType.StringType })) {
+                EventFormScreen(onDone = { navController.popBackStack() })
+            }
+            composable(GpsRoutes.TASK_EDITOR, arguments = listOf(navArgument("taskId") { type = NavType.StringType })) {
+                TaskFormScreen(onDone = { navController.popBackStack() })
+            }
+            composable(GpsRoutes.HABIT_EDITOR, arguments = listOf(navArgument("habitId") { type = NavType.StringType })) {
+                HabitFormScreen(onDone = { navController.popBackStack() })
+            }
+            composable(GpsRoutes.ROUTINE_EDITOR, arguments = listOf(navArgument("routineId") { type = NavType.StringType })) {
+                RoutineFormScreen(onDone = { navController.popBackStack() })
+            }
         }
     }
 }
