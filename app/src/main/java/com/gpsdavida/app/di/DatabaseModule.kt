@@ -7,6 +7,7 @@ import com.gpsdavida.app.data.local.EventDao
 import com.gpsdavida.app.data.local.GpsDatabase
 import com.gpsdavida.app.data.local.HabitCompletionDao
 import com.gpsdavida.app.data.local.HabitDao
+import com.gpsdavida.app.data.local.RoutineDao
 import com.gpsdavida.app.data.local.TaskDao
 import dagger.Module
 import dagger.Provides
@@ -41,4 +42,7 @@ object DatabaseModule {
     @Provides
     fun provideHabitCompletionDao(database: GpsDatabase): HabitCompletionDao =
         database.habitCompletionDao()
+
+    @Provides
+    fun provideRoutineDao(database: GpsDatabase): RoutineDao = database.routineDao()
 }
