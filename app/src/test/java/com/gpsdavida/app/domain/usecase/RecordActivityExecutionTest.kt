@@ -1,5 +1,6 @@
 package com.gpsdavida.app.domain.usecase
 
+import com.gpsdavida.app.domain.model.ActivityExecution
 import com.gpsdavida.app.domain.model.ActivityInstance
 import com.gpsdavida.app.domain.model.ActivityInstanceId
 import com.gpsdavida.app.domain.model.ActivitySource
@@ -7,8 +8,10 @@ import com.gpsdavida.app.domain.model.ActivityStatus
 import com.gpsdavida.app.domain.model.Flexibility
 import com.gpsdavida.app.domain.model.TaskId
 import com.gpsdavida.app.domain.model.TimeRange
+import com.gpsdavida.app.domain.port.ActivityExecutionRepository
 import java.time.Duration
 import java.time.Instant
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -16,14 +19,16 @@ import org.junit.Test
 class RecordActivityExecutionTest {
     private val plannedStart = Instant.parse("2026-01-01T09:00:00Z")
     private val plannedEnd = Instant.parse("2026-01-01T10:00:00Z")
-    private val useCase = RecordActivityExecution()
+    private val repository = FakeActivityExecutionRepository()
+    private val useCase = RecordActivityExecution(repository)
 
     @Test
-    fun `complete records actual time and duration`() {
+    fun `complete persists actual time and duration`() = runTest {
         val actualEnd = Instant.parse("2026-01-01T10:30:00Z")
 
-        val result = useCase.complete(activity(), plannedStart, actualEnd)
+        useCase.complete(activity(), plannedStart, actualEnd)
 
+        val result = repository.saved!!
         assertEquals(ActivityStatus.DONE, result.status)
         assertEquals(TimeRange(plannedStart, actualEnd), result.actual)
         assertEquals(Duration.ofMinutes(90), result.actualDuration)
@@ -31,35 +36,33 @@ class RecordActivityExecutionTest {
     }
 
     @Test
-    fun `skip changes status without inventing execution time`() {
-        val result = useCase.skip(activity())
+    fun `skip persists status without inventing execution time`() = runTest {
+        useCase.skip(activity())
 
-        assertEquals(ActivityStatus.SKIPPED, result.status)
-        assertNull(result.actual)
-        assertNull(result.actualDuration)
+        assertEquals(ActivityStatus.SKIPPED, repository.saved!!.status)
+        assertNull(repository.saved!!.actual)
     }
 
     @Test
-    fun `defer changes status without inventing execution time`() {
-        val result = useCase.defer(activity())
+    fun `defer persists status without inventing execution time`() = runTest {
+        useCase.defer(activity())
 
-        assertEquals(ActivityStatus.DEFERRED, result.status)
-        assertNull(result.actual)
-        assertNull(result.actualDuration)
+        assertEquals(ActivityStatus.DEFERRED, repository.saved!!.status)
+        assertNull(repository.saved!!.actual)
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun `cannot complete an activity that is not pending`() {
+    fun `cannot complete an activity that is not pending`() = runTest {
         useCase.complete(activity().skipped(), plannedStart, plannedEnd)
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun `cannot skip an activity that is not pending`() {
+    fun `cannot skip an activity that is not pending`() = runTest {
         useCase.skip(activity().completed(TimeRange(plannedStart, plannedEnd)))
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun `cannot defer an activity that is not pending`() {
+    fun `cannot defer an activity that is not pending`() = runTest {
         useCase.defer(activity().completed(TimeRange(plannedStart, plannedEnd)))
     }
 
@@ -69,4 +72,16 @@ class RecordActivityExecutionTest {
         flexibility = Flexibility.FLEXIBLE,
         planned = TimeRange(plannedStart, plannedEnd),
     )
+
+    private class FakeActivityExecutionRepository : ActivityExecutionRepository {
+        var saved: ActivityInstance? = null
+
+        override suspend fun save(activity: ActivityInstance) {
+            saved = activity
+        }
+
+        override suspend fun getById(id: ActivityInstanceId): ActivityExecution? = saved?.let {
+            ActivityExecution(it.id, it.status, it.planned, it.actual)
+        }
+    }
 }
