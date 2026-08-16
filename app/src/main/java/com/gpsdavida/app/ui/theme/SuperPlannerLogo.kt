@@ -20,6 +20,18 @@ import androidx.compose.ui.unit.sp
 import com.gpsdavida.app.R
 
 @Composable
+fun SuperPlannerMark(
+    modifier: Modifier = Modifier,
+    size: Dp = 24.dp,
+) {
+    Image(
+        painter = painterResource(R.drawable.ic_super_planner_logo),
+        contentDescription = null,
+        modifier = modifier.width(size).height(size),
+    )
+}
+
+@Composable
 fun SuperPlannerLogo(
     modifier: Modifier = Modifier,
     iconSize: Dp = 52.dp,
@@ -29,11 +41,7 @@ fun SuperPlannerLogo(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Image(
-            painter = painterResource(R.drawable.ic_super_planner_logo),
-            contentDescription = "Super Planner",
-            modifier = Modifier.width(iconSize).height(iconSize),
-        )
+        SuperPlannerMark(size = iconSize)
         Spacer(Modifier.width(12.dp))
         Column {
             Text(
