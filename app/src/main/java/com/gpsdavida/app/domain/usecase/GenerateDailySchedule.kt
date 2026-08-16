@@ -56,7 +56,8 @@ class GenerateDailySchedule @Inject constructor() {
         val flexible = eligible
             .filter { it.flexibility != Flexibility.FIXED }
             .sortedWith(
-                compareByDescending<ActivityInstance> { it.priority.weight }
+                compareByDescending<ActivityInstance> { dependencyDepth(it.source, dependencies) }
+                    .thenByDescending { it.priority.weight }
                     .thenBy { it.planned.start },
             )
 
@@ -177,8 +178,19 @@ class GenerateDailySchedule @Inject constructor() {
     ): Boolean = dependencies
         .filter { it.successor == activity.source }
         .all { dependency ->
-            scheduled.any { it.source == dependency.predecessor && it.status == ActivityStatus.DONE }
+            scheduled.any { it.source == dependency.predecessor }
         }
+
+    private fun dependencyDepth(
+        source: com.gpsdavida.app.domain.model.ActivitySource,
+        dependencies: List<Dependency>,
+        visiting: Set<com.gpsdavida.app.domain.model.ActivitySource> = emptySet(),
+    ): Int {
+        if (source in visiting) return 0
+        val predecessors = dependencies.filter { it.successor == source }.map { it.predecessor }
+        if (predecessors.isEmpty()) return 0
+        return 1 + predecessors.maxOf { dependencyDepth(it, dependencies, visiting + source) }
+    }
 
     private fun bufferAfter(activity: ActivityInstance, defaultBuffer: Duration): Duration =
         activity.bufferAfter ?: defaultBuffer
