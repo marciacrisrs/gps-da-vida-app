@@ -7,6 +7,7 @@ object GpsRoutes {
     const val TASKS = "tasks"
     const val HABITS = "habits"
     const val ROUTINES = "routines"
+    const val AVAILABILITY = "availability"
     const val EVENT_EDITOR = "event_editor/{eventId}"
     const val TASK_EDITOR = "task_editor/{taskId}"
     const val HABIT_EDITOR = "habit_editor/{habitId}"
