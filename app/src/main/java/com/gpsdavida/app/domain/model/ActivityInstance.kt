@@ -9,6 +9,7 @@ data class ActivityInstance(
     val planned: TimeRange,
     val priority: Priority = Priority.IMPORTANT,
     val energy: Energy? = null,
+    val contexts: Set<ExecutionContext> = emptySet(),
     val actual: TimeRange? = null,
     val status: ActivityStatus = ActivityStatus.PENDING,
 ) {
