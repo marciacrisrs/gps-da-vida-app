@@ -3,6 +3,7 @@ package com.gpsdavida.app.di
 import android.content.Context
 import androidx.room.Room
 import com.gpsdavida.app.data.local.AppMetaDao
+import com.gpsdavida.app.data.local.AvailabilityDao
 import com.gpsdavida.app.data.local.EventDao
 import com.gpsdavida.app.data.local.GpsDatabase
 import com.gpsdavida.app.data.local.HabitCompletionDao
@@ -19,7 +20,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
-
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): GpsDatabase =
@@ -27,22 +27,11 @@ object DatabaseModule {
             .fallbackToDestructiveMigration(true)
             .build()
 
-    @Provides
-    fun provideAppMetaDao(database: GpsDatabase): AppMetaDao = database.appMetaDao()
-
-    @Provides
-    fun provideEventDao(database: GpsDatabase): EventDao = database.eventDao()
-
-    @Provides
-    fun provideTaskDao(database: GpsDatabase): TaskDao = database.taskDao()
-
-    @Provides
-    fun provideHabitDao(database: GpsDatabase): HabitDao = database.habitDao()
-
-    @Provides
-    fun provideHabitCompletionDao(database: GpsDatabase): HabitCompletionDao =
-        database.habitCompletionDao()
-
-    @Provides
-    fun provideRoutineDao(database: GpsDatabase): RoutineDao = database.routineDao()
+    @Provides fun provideAppMetaDao(database: GpsDatabase): AppMetaDao = database.appMetaDao()
+    @Provides fun provideEventDao(database: GpsDatabase): EventDao = database.eventDao()
+    @Provides fun provideTaskDao(database: GpsDatabase): TaskDao = database.taskDao()
+    @Provides fun provideHabitDao(database: GpsDatabase): HabitDao = database.habitDao()
+    @Provides fun provideHabitCompletionDao(database: GpsDatabase): HabitCompletionDao = database.habitCompletionDao()
+    @Provides fun provideRoutineDao(database: GpsDatabase): RoutineDao = database.routineDao()
+    @Provides fun provideAvailabilityDao(database: GpsDatabase): AvailabilityDao = database.availabilityDao()
 }
