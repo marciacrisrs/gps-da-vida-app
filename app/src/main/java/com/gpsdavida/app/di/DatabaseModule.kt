@@ -2,6 +2,7 @@ package com.gpsdavida.app.di
 
 import android.content.Context
 import androidx.room.Room
+import com.gpsdavida.app.data.local.ActivityExecutionDao
 import com.gpsdavida.app.data.local.AppMetaDao
 import com.gpsdavida.app.data.local.AvailabilityDao
 import com.gpsdavida.app.data.local.EventDao
@@ -34,4 +35,5 @@ object DatabaseModule {
     @Provides fun provideHabitCompletionDao(database: GpsDatabase): HabitCompletionDao = database.habitCompletionDao()
     @Provides fun provideRoutineDao(database: GpsDatabase): RoutineDao = database.routineDao()
     @Provides fun provideAvailabilityDao(database: GpsDatabase): AvailabilityDao = database.availabilityDao()
+    @Provides fun provideActivityExecutionDao(database: GpsDatabase): ActivityExecutionDao = database.activityExecutionDao()
 }
