@@ -1,12 +1,14 @@
-# GPS da Vida — Design System
+# Super Planner — Design System
 
 ## Direção
 
-O GPS da Vida combina **planner editorial** com **GPS pessoal**.
+O **Super Planner** é o seu GPS da vida: combina **planner editorial** com orientação pessoal.
+
+**Planeje. Foque. Realize.**
 
 A interface deve parecer uma página de planner digital bem cuidada, não um dashboard corporativo. O visual precisa transmitir calma, clareza e orientação: o app organiza a vida sem parecer que está cobrando a pessoa.
 
-A referência é uma inspiração de linguagem, não um modelo a ser copiado literalmente.
+A referência visual é uma inspiração de linguagem, não um modelo a ser copiado literalmente.
 
 ## Princípios visuais
 
@@ -14,9 +16,23 @@ A referência é uma inspiração de linguagem, não um modelo a ser copiado lit
 2. **Poucos elementos por tela** — cada tela deve ter uma ação ou informação dominante.
 3. **Cards grandes e arredondados** — agrupar informação sem criar uma grade densa.
 4. **Editorial, não corporativo** — evitar excesso de linhas, tabelas, chips e dashboards.
-5. **Orgânico com moderação** — blobs, círculos e linhas desenhadas entram como detalhe, nunca como ruído.
-6. **Ação principal evidente** — o GPS deve deixar claro o que importa agora.
+5. **Orgânico com moderação** — folhas, círculos, linhas e formas assimétricas entram como detalhe, nunca como ruído.
+6. **Ação principal evidente** — o Super Planner deve deixar claro o que importa agora.
 7. **Cor com função** — cor ajuda a orientar, não serve para decorar tudo.
+
+## Marca
+
+A marca combina uma **bússola** — direção e planejamento — com **folhas e coração** — vida, bem-estar e humanidade.
+
+A assinatura preferencial é:
+
+**SUPER**
+
+*Planner*
+
+Planeje. Foque. Realize.
+
+O nome do produto é **Super Planner**. **GPS da vida** é o posicionamento/conceito, não o nome do produto.
 
 ## Paleta
 
@@ -46,16 +62,18 @@ A referência é uma inspiração de linguagem, não um modelo a ser copiado lit
 
 ## Tipografia
 
-A tipografia usa `SansSerif` do sistema para manter o app leve e consistente.
+Títulos usam uma serifada elegante para trazer personalidade editorial. Corpo e controles usam sans-serif para manter leitura e acessibilidade.
 
-- Display: 34sp / bold
-- Headline: 28sp / bold
-- Section headline: 24sp / bold
-- Title: 20sp / semibold
-- Body: 16sp / 24sp
-- Secondary body: 14sp / 20sp
-- Label: 14sp / semibold
-- Small label: 12sp / medium
+- Display: 34sp / serif / bold
+- Headline: 28sp / serif / bold
+- Section headline: 24sp / serif / bold
+- Title: 20sp / serif / bold
+- Body: 16sp / sans-serif / regular
+- Secondary body: 14sp / sans-serif / regular
+- Label: 14sp / sans-serif / semibold
+- Small label: 12sp / sans-serif / medium
+
+A palavra **Planner** da marca pode usar uma fonte cursiva como detalhe de assinatura, sem aplicar cursiva ao restante da interface.
 
 ## Formas e espaçamento
 
@@ -68,11 +86,13 @@ A tipografia usa `SansSerif` do sistema para manter o app leve e consistente.
 
 ## Iconografia
 
-Ícones devem ser simples, reconhecíveis e funcionais. A iconografia não deve competir com títulos ou com a próxima ação.
+Ícones devem ser simples, arredondados e reconhecíveis, com peso visual consistente. Categorias podem usar ícones em pequenos containers pastel, mantendo o ícone como ponto de orientação.
+
+A iconografia não deve competir com títulos ou com a próxima ação.
 
 ## Elementos orgânicos
 
-Podem aparecer como pequenos círculos, blobs assimétricos, linhas desenhadas, pequenos marcadores e ilustrações minimalistas. Decoração nunca deve competir com a ação principal.
+Podem aparecer como pequenos círculos, folhas, blobs assimétricos, linhas desenhadas, pequenos marcadores e ilustrações minimalistas. Decoração nunca deve competir com a ação principal.
 
 ## O que evitar
 
