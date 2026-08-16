@@ -13,13 +13,9 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,10 +23,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.gpsdavida.app.R
 import com.gpsdavida.app.ui.theme.GpsDaVidaColors
+import com.gpsdavida.app.ui.theme.SuperPlannerCard
+import com.gpsdavida.app.ui.theme.SuperPlannerMetadata
+import com.gpsdavida.app.ui.theme.SuperPlannerPrimaryButton
+import com.gpsdavida.app.ui.theme.SuperPlannerSecondaryActions
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
@@ -54,11 +53,7 @@ fun NextActionCard(
     onSwap: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.extraLarge,
-        colors = CardDefaults.cardColors(containerColor = GpsDaVidaColors.SurfaceWarm),
-    ) {
+    SuperPlannerCard(modifier = modifier.fillMaxWidth()) {
         when (model.state) {
             NextActionState.Empty -> EmptyContent()
             NextActionState.Completed -> CompletedContent(model.title)
@@ -76,74 +71,63 @@ private fun ReadyContent(
     onSwap: () -> Unit,
 ) {
     Column(
-        modifier = Modifier.padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier.padding(28.dp),
+        verticalArrangement = Arrangement.spacedBy(18.dp),
     ) {
         NextLabel()
-        Text(model.title, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.SemiBold)
+        Text(
+            text = model.title,
+            style = MaterialTheme.typography.headlineMedium,
+            color = GpsDaVidaColors.Ink,
+        )
         MetadataRow(model)
-        Spacer(modifier = Modifier.size(4.dp))
-        Button(
+        Spacer(modifier = Modifier.size(2.dp))
+        SuperPlannerPrimaryButton(
+            text = stringResource(if (model.state == NextActionState.Ready) R.string.next_action_start else R.string.next_action_complete),
             onClick = if (model.state == NextActionState.Ready) onStart else onComplete,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Icon(
-                imageVector = if (model.state == NextActionState.Ready) Icons.Filled.PlayArrow else Icons.Filled.Check,
-                contentDescription = null,
-            )
-            Spacer(modifier = Modifier.size(8.dp))
-            Text(stringResource(if (model.state == NextActionState.Ready) R.string.next_action_start else R.string.next_action_complete))
-        }
+        )
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            OutlinedButton(onClick = onSnooze) {
-                Text(stringResource(R.string.next_action_snooze))
-            }
-            IconButton(onClick = onSwap) {
-                Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.next_action_swap))
-            }
+            SuperPlannerSecondaryActions(
+                primaryText = stringResource(R.string.next_action_swap),
+                onPrimary = onSwap,
+                secondaryText = stringResource(R.string.next_action_snooze),
+                onSecondary = onSnooze,
+                modifier = Modifier.weight(1f),
+            )
         }
     }
 }
 
 @Composable
 private fun MetadataRow(model: NextActionUiModel) {
-    Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
-        model.scheduledTime?.let {
-            MetadataItem(it.format(DateTimeFormatter.ofPattern("HH:mm")), GpsDaVidaColors.TerracottaDark)
-        }
-        model.durationMinutes?.let {
-            MetadataItem(stringResource(R.string.next_action_duration, it), GpsDaVidaColors.Warning)
-        }
-        model.priorityLabel?.let { MetadataItem(it, GpsDaVidaColors.Rose) }
-        model.contextLabel?.let { MetadataItem(it, GpsDaVidaColors.Sage) }
+    val items = buildList {
+        model.scheduledTime?.let { add(it.format(DateTimeFormatter.ofPattern("HH:mm")) to GpsDaVidaColors.TerracottaDark) }
+        model.durationMinutes?.let { add(stringResource(R.string.next_action_duration, it) to GpsDaVidaColors.Warning) }
+        model.priorityLabel?.let { add(it to GpsDaVidaColors.Rose) }
+        model.contextLabel?.let { add(it to GpsDaVidaColors.Sage) }
     }
-}
-
-@Composable
-private fun MetadataItem(text: String, color: Color) {
-    Text(text, style = MaterialTheme.typography.labelLarge, color = color)
+    SuperPlannerMetadata(items)
 }
 
 @Composable
 private fun NextLabel() {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Icon(Icons.Filled.Star, contentDescription = null, tint = GpsDaVidaColors.Terracotta, modifier = Modifier.size(20.dp))
+        Icon(Icons.Filled.Star, contentDescription = null, tint = GpsDaVidaColors.Terracotta, modifier = Modifier.size(18.dp))
         Text(
-            stringResource(R.string.next_action_label),
+            text = stringResource(R.string.next_action_label),
             style = MaterialTheme.typography.labelLarge,
             color = GpsDaVidaColors.TerracottaDark,
-            fontWeight = FontWeight.Bold,
         )
     }
 }
 
 @Composable
 private fun EmptyContent() {
-    Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    Column(modifier = Modifier.padding(28.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Icon(Icons.Filled.Check, contentDescription = null, tint = GpsDaVidaColors.Sage, modifier = Modifier.size(28.dp))
         Text(stringResource(R.string.next_action_empty_title), style = MaterialTheme.typography.headlineSmall)
         Text(stringResource(R.string.next_action_empty_body), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -153,7 +137,7 @@ private fun EmptyContent() {
 @Composable
 private fun CompletedContent(title: String) {
     Row(
-        modifier = Modifier.padding(24.dp),
+        modifier = Modifier.padding(28.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
