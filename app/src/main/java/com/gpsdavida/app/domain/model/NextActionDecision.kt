@@ -16,5 +16,6 @@ data class NextActionContext(
     val availability: List<Availability> = emptyList(),
     val dependencies: List<Dependency> = emptyList(),
     val currentEnergy: Energy? = null,
+    val currentContext: ExecutionContext? = null,
     val zoneId: ZoneId = ZoneId.systemDefault(),
 )
