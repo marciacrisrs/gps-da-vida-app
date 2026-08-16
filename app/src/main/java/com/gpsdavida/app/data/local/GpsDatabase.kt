@@ -12,8 +12,9 @@ import androidx.room.RoomDatabase
         HabitCompletionEntity::class,
         RoutineEntity::class,
         RoutineStepEntity::class,
+        AvailabilityEntity::class,
     ],
-    version = 5,
+    version = 6,
     exportSchema = false,
 )
 abstract class GpsDatabase : RoomDatabase() {
@@ -23,4 +24,5 @@ abstract class GpsDatabase : RoomDatabase() {
     abstract fun habitDao(): HabitDao
     abstract fun habitCompletionDao(): HabitCompletionDao
     abstract fun routineDao(): RoutineDao
+    abstract fun availabilityDao(): AvailabilityDao
 }
