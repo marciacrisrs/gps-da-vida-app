@@ -2,10 +2,12 @@ package com.gpsdavida.app.ui.routines
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -34,7 +36,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -45,7 +46,7 @@ import java.time.DayOfWeek
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun RoutineFormScreen(
     onDone: () -> Unit,
@@ -66,10 +67,7 @@ fun RoutineFormScreen(
             )
         },
     ) { padding ->
-        Column(
-            modifier = Modifier.padding(padding).padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
+        Column(Modifier.padding(padding).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             OutlinedTextField(
                 value = state.title,
                 onValueChange = viewModel::onTitleChange,
@@ -89,13 +87,11 @@ fun RoutineFormScreen(
                     FilterChip(selected = state.priority == priority, onClick = { viewModel.onPriority(priority) }, label = { Text(stringResource(priority.labelRes())) })
                 }
             }
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
                 Text(stringResource(R.string.routine_start_time))
                 Switch(checked = state.hasStartTime, onCheckedChange = viewModel::setHasStartTime)
             }
-            if (state.hasStartTime) {
-                OutlinedButton(onClick = { pickStart = true }) { Text(state.startTime.format(timeFmt)) }
-            }
+            if (state.hasStartTime) OutlinedButton(onClick = { pickStart = true }) { Text(state.startTime.format(timeFmt)) }
             Text(stringResource(R.string.routine_steps))
             state.steps.forEachIndexed { index, step ->
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -113,21 +109,13 @@ fun RoutineFormScreen(
         }
     }
 
-    if (pickStart) {
-        RoutineTimePickerDialog(
-            initial = state.startTime,
-            onDismiss = { pickStart = false },
-            onConfirm = { viewModel.onStartTime(it); pickStart = false },
-        )
-    }
-    if (confirmDelete) {
-        AlertDialog(
-            onDismissRequest = { confirmDelete = false },
-            title = { Text(stringResource(R.string.routine_delete_confirm)) },
-            confirmButton = { TextButton(onClick = { confirmDelete = false; viewModel.delete() }) { Text(stringResource(R.string.routine_delete)) } },
-            dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text(stringResource(R.string.action_cancel)) } },
-        )
-    }
+    if (pickStart) RoutineTimePickerDialog(state.startTime, { pickStart = false }) { viewModel.onStartTime(it); pickStart = false }
+    if (confirmDelete) AlertDialog(
+        onDismissRequest = { confirmDelete = false },
+        title = { Text(stringResource(R.string.routine_delete_confirm)) },
+        confirmButton = { TextButton(onClick = { confirmDelete = false; viewModel.delete() }) { Text(stringResource(R.string.routine_delete)) } },
+        dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text(stringResource(R.string.action_cancel)) } },
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
