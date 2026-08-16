@@ -2,18 +2,27 @@ package com.gpsdavida.app.domain.usecase
 
 import com.gpsdavida.app.domain.model.ActivityInstance
 import com.gpsdavida.app.domain.model.TimeRange
+import com.gpsdavida.app.domain.port.ActivityExecutionRepository
 import java.time.Instant
 import javax.inject.Inject
 
-/** Applies an explicit execution transition to a materialized activity instance. */
-class RecordActivityExecution @Inject constructor() {
-    fun complete(
+/** Applies an execution transition and persists the resulting domain state. */
+class RecordActivityExecution @Inject constructor(
+    private val repository: ActivityExecutionRepository,
+) {
+    suspend fun complete(
         activity: ActivityInstance,
         actualStart: Instant,
         actualEnd: Instant,
-    ): ActivityInstance = activity.completed(TimeRange(actualStart, actualEnd))
+    ) {
+        repository.save(activity.completed(TimeRange(actualStart, actualEnd)))
+    }
 
-    fun skip(activity: ActivityInstance): ActivityInstance = activity.skipped()
+    suspend fun skip(activity: ActivityInstance) {
+        repository.save(activity.skipped())
+    }
 
-    fun defer(activity: ActivityInstance): ActivityInstance = activity.deferred()
+    suspend fun defer(activity: ActivityInstance) {
+        repository.save(activity.deferred())
+    }
 }
