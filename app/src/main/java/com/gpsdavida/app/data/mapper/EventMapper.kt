@@ -5,7 +5,6 @@ import com.gpsdavida.app.domain.model.Event
 import com.gpsdavida.app.domain.model.EventId
 import com.gpsdavida.app.domain.model.Priority
 import com.gpsdavida.app.domain.model.TimeRange
-import java.time.DayOfWeek
 import java.time.Instant
 
 fun EventEntity.toDomain(): Event =
@@ -29,7 +28,3 @@ fun Event.toEntity(): EventEntity =
         recurrenceDays = recurrenceDays.joinToString(",") { it.name },
         priority = priority.name,
     )
-
-private fun String.toDaySet(): Set<DayOfWeek> =
-    if (isBlank()) emptySet()
-    else split(',').map { DayOfWeek.valueOf(it) }.toSet()

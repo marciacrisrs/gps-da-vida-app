@@ -19,6 +19,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gpsdavida.app.R
 import com.gpsdavida.app.ui.events.EventRow
+import com.gpsdavida.app.ui.habits.HabitDayRow
 import com.gpsdavida.app.ui.tasks.TaskRow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,6 +28,7 @@ fun MeuDiaScreen(
     onAddEvent: () -> Unit,
     onOpenEvent: (String) -> Unit,
     onOpenTask: (String) -> Unit,
+    onOpenHabit: (String) -> Unit,
     viewModel: MeuDiaViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -38,7 +40,7 @@ fun MeuDiaScreen(
             }
         },
     ) { padding ->
-        val empty = state.events.isEmpty() && state.tasks.isEmpty()
+        val empty = state.events.isEmpty() && state.tasks.isEmpty() && state.habits.isEmpty()
         Column(modifier = Modifier.padding(padding)) {
             if (empty) {
                 Text(
@@ -65,6 +67,19 @@ fun MeuDiaScreen(
                             task = task,
                             onClick = { onOpenTask(task.id.value) },
                             onToggleDone = { viewModel.setTaskDone(task.id.value, it) },
+                        )
+                    }
+                }
+                if (state.habits.isNotEmpty()) {
+                    Text(
+                        text = stringResource(R.string.nav_habitos),
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    )
+                    state.habits.forEach { habitDay ->
+                        HabitDayRow(
+                            item = habitDay,
+                            onClick = { onOpenHabit(habitDay.habit.id.value) },
+                            onToggleDone = { viewModel.setHabitDone(habitDay.habit.id.value, it) },
                         )
                     }
                 }

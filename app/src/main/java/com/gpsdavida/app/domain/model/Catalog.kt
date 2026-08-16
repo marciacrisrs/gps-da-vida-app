@@ -59,6 +59,9 @@ data class Habit(
     val goalId: GoalId? = null,
 ) {
     val flexibility: Flexibility get() = Flexibility.FLEXIBLE
+
+    fun occursOn(date: LocalDate): Boolean =
+        daysOfWeek.isEmpty() || date.dayOfWeek in daysOfWeek
 }
 
 data class RoutineStep(

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.Icon
@@ -27,6 +28,8 @@ import com.gpsdavida.app.R
 import com.gpsdavida.app.ui.agora.AgoraScreen
 import com.gpsdavida.app.ui.events.EventFormScreen
 import com.gpsdavida.app.ui.events.EventsListScreen
+import com.gpsdavida.app.ui.habits.HabitFormScreen
+import com.gpsdavida.app.ui.habits.HabitsListScreen
 import com.gpsdavida.app.ui.meudia.MeuDiaScreen
 import com.gpsdavida.app.ui.tasks.TaskFormScreen
 import com.gpsdavida.app.ui.tasks.TasksListScreen
@@ -41,6 +44,7 @@ fun GpsNavHost() {
         GpsRoutes.MEU_DIA,
         GpsRoutes.EVENTS,
         GpsRoutes.TASKS,
+        GpsRoutes.HABITS,
     )
 
     Scaffold(
@@ -71,6 +75,12 @@ fun GpsNavHost() {
                         icon = { Icon(Icons.Filled.Check, contentDescription = null) },
                         label = { Text(stringResource(R.string.nav_tarefas)) },
                     )
+                    NavigationBarItem(
+                        selected = currentRoute == GpsRoutes.HABITS,
+                        onClick = { navController.navigateToTab(GpsRoutes.HABITS) },
+                        icon = { Icon(Icons.Filled.Favorite, contentDescription = null) },
+                        label = { Text(stringResource(R.string.nav_habitos)) },
+                    )
                 }
             }
         },
@@ -86,6 +96,7 @@ fun GpsNavHost() {
                     onAddEvent = { navController.navigate(GpsRoutes.eventEditor()) },
                     onOpenEvent = { id -> navController.navigate(GpsRoutes.eventEditor(id)) },
                     onOpenTask = { id -> navController.navigate(GpsRoutes.taskEditor(id)) },
+                    onOpenHabit = { id -> navController.navigate(GpsRoutes.habitEditor(id)) },
                 )
             }
             composable(GpsRoutes.EVENTS) {
@@ -100,6 +111,12 @@ fun GpsNavHost() {
                     onOpen = { id -> navController.navigate(GpsRoutes.taskEditor(id)) },
                 )
             }
+            composable(GpsRoutes.HABITS) {
+                HabitsListScreen(
+                    onAdd = { navController.navigate(GpsRoutes.habitEditor()) },
+                    onOpen = { id -> navController.navigate(GpsRoutes.habitEditor(id)) },
+                )
+            }
             composable(
                 route = GpsRoutes.EVENT_EDITOR,
                 arguments = listOf(navArgument("eventId") { type = NavType.StringType }),
@@ -111,6 +128,12 @@ fun GpsNavHost() {
                 arguments = listOf(navArgument("taskId") { type = NavType.StringType }),
             ) {
                 TaskFormScreen(onDone = { navController.popBackStack() })
+            }
+            composable(
+                route = GpsRoutes.HABIT_EDITOR,
+                arguments = listOf(navArgument("habitId") { type = NavType.StringType }),
+            ) {
+                HabitFormScreen(onDone = { navController.popBackStack() })
             }
         }
     }
