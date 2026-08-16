@@ -20,13 +20,7 @@ import java.time.LocalTime
 import java.time.ZoneId
 import javax.inject.Inject
 
-/**
- * Builds one executable daily schedule from already materialized activity instances.
- *
- * The generator is intentionally agnostic to activity origin. Recurrences, plans,
- * habits and other domains are expected to materialize their occurrences before
- * reaching this boundary.
- */
+/** Builds an executable daily schedule from materialized activity instances. */
 class GenerateDailySchedule @Inject constructor() {
     operator fun invoke(
         activities: List<ActivityInstance>,
@@ -44,7 +38,6 @@ class GenerateDailySchedule @Inject constructor() {
         val fixed = eligible
             .filter { it.flexibility == Flexibility.FIXED }
             .sortedBy { it.planned.start }
-            .toMutableList()
         val conflicts = mutableListOf<ScheduleConflict>()
 
         fixed.zipWithNext().forEach { (left, right) ->
@@ -54,23 +47,39 @@ class GenerateDailySchedule @Inject constructor() {
         }
 
         val scheduled = fixed.toMutableList()
-        val flexible = eligible
-            .filter { it.flexibility != Flexibility.FIXED }
-            .sortedWith(
-                compareByDescending<ActivityInstance> { dependencyDepth(it.source, dependencies) }
-                    .thenByDescending { it.priority.weight }
+        val pending = eligible.filter { it.flexibility != Flexibility.FIXED }.toMutableList()
+
+        while (pending.isNotEmpty()) {
+            val ready = pending.filter { activity ->
+                dependencies
+                    .filter { it.successor == activity.source }
+                    .all { dependency -> scheduled.any { it.source == dependency.predecessor } }
+            }
+
+            if (ready.isEmpty()) {
+                pending.forEach { conflicts += ScheduleConflict(it, ScheduleConflictReason.DEPENDENCY_NOT_SATISFIED) }
+                break
+            }
+
+            val activity = ready.minWith(
+                compareBy<ActivityInstance> { dependencyDepth(it.source, dependencies) }
+                    .thenBy { it.priority.weight }
                     .thenBy { it.planned.start },
             )
+            pending.remove(activity)
 
-        for (activity in flexible) {
             val predecessors = dependencies
                 .filter { it.successor == activity.source }
                 .mapNotNull { dependency -> scheduled.firstOrNull { it.source == dependency.predecessor } }
 
-            if (predecessors.size != dependencies.count { it.successor == activity.source }) {
-                conflicts += ScheduleConflict(activity, ScheduleConflictReason.DEPENDENCY_NOT_SATISFIED)
-                continue
-            }
+            val earliestStart = maxOf(
+                activity.planned.start,
+                predecessors.maxOfOrNull {
+                    it.planned.end
+                        .plus(bufferAfter(it, defaultBuffer))
+                        .plus(travelDuration(it, activity, travelTimes))
+                } ?: activity.planned.start,
+            )
 
             val slot = findSlot(
                 activity = activity,
@@ -80,9 +89,7 @@ class GenerateDailySchedule @Inject constructor() {
                 defaultBuffer = defaultBuffer,
                 travelTimes = travelTimes,
                 zoneId = zoneId,
-                earliestStart = predecessors.maxOfOrNull {
-                    it.planned.end.plus(bufferAfter(it, defaultBuffer)).plus(travelDuration(it, activity, travelTimes))
-                },
+                earliestStart = earliestStart,
             )
 
             if (slot == null) {
@@ -106,53 +113,40 @@ class GenerateDailySchedule @Inject constructor() {
         defaultBuffer: Duration,
         travelTimes: List<TravelTime>,
         zoneId: ZoneId,
-        earliestStart: Instant? = null,
+        earliestStart: Instant,
     ): TimeRange? {
         val windows = availableWindows(date, availability)
         val occupied = scheduled.sortedBy { it.planned.start }
         val duration = activity.plannedDuration
 
         for (window in windows) {
-            var cursor = maxOf(window.start.atDate(date, zoneId), earliestStart ?: window.start.atDate(date, zoneId))
+            val windowStart = window.start.atDate(date, zoneId)
             val windowEnd = window.end.atDate(date, zoneId)
-            var previous: ActivityInstance? = null
+            var cursor = maxOf(windowStart, earliestStart)
+            if (cursor >= windowEnd) continue
 
             for (existing in occupied) {
-                if (existing.planned.end <= cursor) {
-                    previous = existing
-                    continue
-                }
+                if (existing.planned.end <= cursor) continue
                 if (existing.planned.start >= windowEnd) break
 
-                val candidate = cursorAfter(previous, cursor, activity, defaultBuffer, travelTimes)
-                if (candidate.plus(duration) <= existing.planned.start && candidate.plus(duration) <= windowEnd) {
-                    return TimeRange(candidate, candidate.plus(duration))
+                if (cursor.plus(duration) <= existing.planned.start && cursor.plus(duration) <= windowEnd) {
+                    return TimeRange(cursor, cursor.plus(duration))
                 }
 
-                cursor = maxOf(cursor, existing.planned.end.plus(bufferAfter(existing, defaultBuffer)))
-                previous = existing
+                cursor = maxOf(
+                    cursor,
+                    existing.planned.end
+                        .plus(bufferAfter(existing, defaultBuffer))
+                        .plus(travelDuration(existing, activity, travelTimes)),
+                )
+                if (cursor >= windowEnd) break
             }
 
-            val candidate = cursorAfter(previous, cursor, activity, defaultBuffer, travelTimes)
-            if (candidate.plus(duration) <= windowEnd) {
-                return TimeRange(candidate, candidate.plus(duration))
+            if (cursor.plus(duration) <= windowEnd) {
+                return TimeRange(cursor, cursor.plus(duration))
             }
         }
         return null
-    }
-
-    private fun cursorAfter(
-        previous: ActivityInstance?,
-        cursor: Instant,
-        target: ActivityInstance,
-        defaultBuffer: Duration,
-        travelTimes: List<TravelTime>,
-    ): Instant {
-        if (previous == null) return cursor
-        val afterPrevious = previous.planned.end
-            .plus(bufferAfter(previous, defaultBuffer))
-            .plus(travelDuration(previous, target, travelTimes))
-        return maxOf(cursor, afterPrevious)
     }
 
     private fun availableWindows(
@@ -164,19 +158,42 @@ class GenerateDailySchedule @Inject constructor() {
         }
 
         val rules = availability.filter { it.dayOfWeek == date.dayOfWeek }
-        val free = rules.filter { it.kind == AvailabilityKind.FREE }.map { it.window }
-        if (free.isNotEmpty()) return free.sortedBy { it.start }
+        val blocked = rules
+            .filter { it.kind == AvailabilityKind.BLOCKED }
+            .map { it.window }
+            .sortedBy { it.start }
 
-        val blocked = rules.filter { it.kind == AvailabilityKind.BLOCKED }.map { it.window }
-        if (blocked.isEmpty()) return listOf(LocalTimeWindow(LocalTime.MIN, LocalTime.MAX))
+        val free = rules
+            .filter { it.kind == AvailabilityKind.FREE }
+            .map { it.window }
+            .sortedBy { it.start }
 
-        val result = mutableListOf<LocalTimeWindow>()
-        var cursor = LocalTime.MIN
-        for (block in blocked.sortedBy { it.start }) {
-            if (cursor < block.start) result += LocalTimeWindow(cursor, block.start)
-            cursor = maxOf(cursor, block.end)
+        val base = if (free.isEmpty()) {
+            listOf(LocalTimeWindow(LocalTime.MIN, LocalTime.MAX))
+        } else {
+            free
         }
-        if (cursor < LocalTime.MAX) result += LocalTimeWindow(cursor, LocalTime.MAX)
+
+        return base.flatMap { window -> subtractBlocked(window, blocked) }
+    }
+
+    private fun subtractBlocked(
+        window: LocalTimeWindow,
+        blocked: List<LocalTimeWindow>,
+    ): List<LocalTimeWindow> {
+        val result = mutableListOf<LocalTimeWindow>()
+        var cursor = window.start
+
+        for (block in blocked) {
+            if (block.end <= cursor || block.start >= window.end) continue
+            val blockStart = maxOf(block.start, window.start)
+            val blockEnd = minOf(block.end, window.end)
+            if (cursor < blockStart) result += LocalTimeWindow(cursor, blockStart)
+            cursor = maxOf(cursor, blockEnd)
+            if (cursor >= window.end) break
+        }
+
+        if (cursor < window.end) result += LocalTimeWindow(cursor, window.end)
         return result
     }
 
