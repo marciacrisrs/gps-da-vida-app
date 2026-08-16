@@ -57,22 +57,14 @@ A tipografia usa `SansSerif` do sistema para manter o app leve e consistente.
 - Label: 14sp / semibold
 - Small label: 12sp / medium
 
-Títulos podem ter maior presença; textos de apoio devem permanecer discretos.
-
-## Formas
+## Formas e espaçamento
 
 - Pequeno: 14dp
 - Médio: 20dp
 - Grande: 28dp
 - Extra grande: 32dp
-
-Cards principais devem preferir os raios maiores. Evitar componentes excessivamente quadrados.
-
-## Espaçamento
-
-Base de 4dp, com preferência por 8/12/16/24/32dp.
-
-Margem de página padrão: 24dp.
+- Margem de página padrão: 24dp
+- Base de espaçamento: 4dp, com preferência por 8/12/16/24/32dp
 
 ## Iconografia
 
@@ -80,15 +72,7 @@ Margem de página padrão: 24dp.
 
 ## Elementos orgânicos
 
-Podem aparecer como:
-
-- pequenos círculos;
-- blobs assimétricos;
-- linhas desenhadas;
-- pequenos marcadores;
-- ilustrações minimalistas.
-
-Nunca usar decoração atrás de conteúdo crítico ou perto da ação principal a ponto de reduzir contraste.
+Podem aparecer como pequenos círculos, blobs assimétricos, linhas desenhadas, pequenos marcadores e ilustrações minimalistas. Decoração nunca deve competir com a ação principal.
 
 ## O que evitar
 
@@ -108,6 +92,4 @@ A linguagem visual deve reforçar a metáfora central:
 
 **Plano → Programação → Rota → Execução**
 
-O visual não deve esconder a complexidade do motor. Deve transformar sua saída em uma orientação simples e humana.
-
-A tela `Agora` é operacional. A tela `Meu Dia` é a página de planner. A semana é visão estratégica. O componente `O que faço agora?` é o ponto de maior destaque da experiência.
+`Agora` é operacional. `Meu Dia` é a página de planner. A semana é visão estratégica. `O que faço agora?` é o ponto de maior destaque da experiência.
