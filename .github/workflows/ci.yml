@@ -16,4 +16,4 @@ jobs:
           java-version: 17
       - uses: android-actions/setup-android@v3
       - name: Unit tests and debug APK
-        run: ./gradlew test assembleDebug --stacktrace
+        run: chmod +x gradlew && ./gradlew test assembleDebug --stacktrace
