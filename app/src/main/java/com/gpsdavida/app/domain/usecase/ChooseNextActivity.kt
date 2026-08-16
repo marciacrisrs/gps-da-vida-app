@@ -8,8 +8,10 @@ import com.gpsdavida.app.domain.model.Dependency
 import com.gpsdavida.app.domain.model.Energy
 import com.gpsdavida.app.domain.model.ExecutionContext
 import com.gpsdavida.app.domain.model.Flexibility
+import com.gpsdavida.app.domain.model.LocationId
 import com.gpsdavida.app.domain.model.NextActionContext
 import com.gpsdavida.app.domain.model.NextActionDecision
+import java.time.Duration
 import java.time.Instant
 import java.time.LocalTime
 import javax.inject.Inject
@@ -40,6 +42,7 @@ class ChooseNextActivity @Inject constructor() {
             .filter { isAvailable(it, context) }
             .filter { matchesContext(it, context.currentContext) }
             .filter { dependenciesSatisfied(it, activities, context.dependencies) }
+            .filter { travelFitsBeforeStart(it, context, activities) }
             .toList()
 
         val current = executable
@@ -55,6 +58,7 @@ class ChooseNextActivity @Inject constructor() {
         return NextActionDecision(
             current = current,
             next = next,
+            travelDurationToNext = travelDurationTo(next, current, context),
         )
     }
 
@@ -104,6 +108,38 @@ class ChooseNextActivity @Inject constructor() {
                 it.source == dependency.predecessor && it.status == ActivityStatus.DONE
             }
         }
+
+    private fun travelFitsBeforeStart(
+        activity: ActivityInstance,
+        context: NextActionContext,
+        activities: List<ActivityInstance>,
+    ): Boolean {
+        if (activity.planned.start <= context.now) return true
+
+        val current = activities
+            .filter { it.status == ActivityStatus.PENDING }
+            .filter { it.planned.start <= context.now && context.now < it.planned.end }
+            .minWithOrNull(currentComparator)
+
+        val departure = current?.planned?.end ?: context.now
+        val duration = travelDurationTo(activity, current, context)
+        return departure.plus(duration) <= activity.planned.start
+    }
+
+    private fun travelDurationTo(
+        target: ActivityInstance?,
+        current: ActivityInstance?,
+        context: NextActionContext,
+    ): Duration {
+        val targetLocation = target?.location?.id ?: return Duration.ZERO
+        val origin = current?.location?.id ?: context.currentLocation ?: return Duration.ZERO
+        if (origin == targetLocation) return Duration.ZERO
+
+        return context.travelTimes
+            .firstOrNull { it.from == origin && it.to == targetLocation }
+            ?.duration
+            ?: Duration.ZERO
+    }
 
     private fun rangesOverlap(
         start: LocalTime,
