@@ -10,6 +10,7 @@ import com.gpsdavida.app.domain.model.AvailabilityKind
 import com.gpsdavida.app.domain.model.Dependency
 import com.gpsdavida.app.domain.model.DependencyId
 import com.gpsdavida.app.domain.model.Energy
+import com.gpsdavida.app.domain.model.ExecutionContext
 import com.gpsdavida.app.domain.model.Flexibility
 import com.gpsdavida.app.domain.model.LocalTimeWindow
 import com.gpsdavida.app.domain.model.NextActionContext
@@ -151,12 +152,65 @@ class ChooseNextActivityTest {
         assertEquals(high.id, decision.recommended?.id)
     }
 
+    @Test
+    fun `current context excludes activities requiring another context`() {
+        val computer = activity(
+            id = "computer",
+            start = "11:00:00",
+            end = "11:30:00",
+            priority = Priority.IMPORTANT,
+            contexts = setOf(ExecutionContext.COMPUTER),
+        )
+        val home = activity(
+            id = "home",
+            start = "11:30:00",
+            end = "12:00:00",
+            priority = Priority.IMPORTANT,
+            contexts = setOf(ExecutionContext.HOME),
+        )
+
+        val decision = useCase(
+            listOf(computer, home),
+            NextActionContext(now = now, currentContext = ExecutionContext.HOME),
+        )
+
+        assertEquals(home.id, decision.recommended?.id)
+    }
+
+    @Test
+    fun `activities without context remain executable in any current context`() {
+        val unrestricted = activity("unrestricted", "11:00:00", "11:30:00", Priority.IMPORTANT)
+
+        val decision = useCase(
+            listOf(unrestricted),
+            NextActionContext(now = now, currentContext = ExecutionContext.OUTSIDE),
+        )
+
+        assertEquals(unrestricted.id, decision.recommended?.id)
+    }
+
+    @Test
+    fun `without current context all activities remain eligible`() {
+        val computer = activity(
+            id = "computer",
+            start = "11:00:00",
+            end = "11:30:00",
+            priority = Priority.IMPORTANT,
+            contexts = setOf(ExecutionContext.COMPUTER),
+        )
+
+        val decision = useCase(listOf(computer), NextActionContext(now = now))
+
+        assertEquals(computer.id, decision.recommended?.id)
+    }
+
     private fun activity(
         id: String,
         start: String,
         end: String,
         priority: Priority,
         energy: Energy? = null,
+        contexts: Set<ExecutionContext> = emptySet(),
     ): ActivityInstance {
         val startInstant = Instant.parse("2026-08-17T${start}Z")
         val endInstant = Instant.parse("2026-08-17T${end}Z")
@@ -167,6 +221,7 @@ class ChooseNextActivityTest {
             planned = TimeRange(startInstant, endInstant),
             priority = priority,
             energy = energy,
+            contexts = contexts,
         )
     }
 }
