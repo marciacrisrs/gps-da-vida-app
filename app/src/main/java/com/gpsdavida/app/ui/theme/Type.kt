@@ -5,32 +5,32 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-/** Typography rules for the editorial-planner visual language. */
+/** Typography rules for the Super Planner editorial-planner visual language. */
 val GpsDaVidaTypography = Typography().run {
     copy(
         displayLarge = displayLarge.copy(
-            fontFamily = FontFamily.SansSerif,
+            fontFamily = FontFamily.Serif,
             fontWeight = FontWeight.Bold,
             fontSize = 34.sp,
             lineHeight = 40.sp,
             letterSpacing = (-0.5).sp,
         ),
         headlineLarge = headlineLarge.copy(
-            fontFamily = FontFamily.SansSerif,
+            fontFamily = FontFamily.Serif,
             fontWeight = FontWeight.Bold,
             fontSize = 28.sp,
             lineHeight = 34.sp,
             letterSpacing = (-0.25).sp,
         ),
         headlineMedium = headlineMedium.copy(
-            fontFamily = FontFamily.SansSerif,
+            fontFamily = FontFamily.Serif,
             fontWeight = FontWeight.Bold,
             fontSize = 24.sp,
             lineHeight = 30.sp,
         ),
         titleLarge = titleLarge.copy(
-            fontFamily = FontFamily.SansSerif,
-            fontWeight = FontWeight.SemiBold,
+            fontFamily = FontFamily.Serif,
+            fontWeight = FontWeight.Bold,
             fontSize = 20.sp,
             lineHeight = 26.sp,
         ),
