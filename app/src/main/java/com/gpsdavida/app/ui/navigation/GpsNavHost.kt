@@ -26,6 +26,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.gpsdavida.app.R
 import com.gpsdavida.app.ui.agora.AgoraScreen
+import com.gpsdavida.app.ui.availability.AvailabilityScreen
 import com.gpsdavida.app.ui.events.EventFormScreen
 import com.gpsdavida.app.ui.events.EventsListScreen
 import com.gpsdavida.app.ui.habits.HabitFormScreen
@@ -68,8 +69,10 @@ fun GpsNavHost() {
                     onOpenEvent = { id -> navController.navigate(GpsRoutes.eventEditor(id)) },
                     onOpenTask = { id -> navController.navigate(GpsRoutes.taskEditor(id)) },
                     onOpenHabit = { id -> navController.navigate(GpsRoutes.habitEditor(id)) },
+                    onOpenAvailability = { navController.navigate(GpsRoutes.AVAILABILITY) },
                 )
             }
+            composable(GpsRoutes.AVAILABILITY) { AvailabilityScreen() }
             composable(GpsRoutes.EVENTS) { EventsListScreen({ navController.navigate(GpsRoutes.eventEditor()) }, { navController.navigate(GpsRoutes.eventEditor(it)) }) }
             composable(GpsRoutes.TASKS) { TasksListScreen({ navController.navigate(GpsRoutes.taskEditor()) }, { navController.navigate(GpsRoutes.taskEditor(it)) }) }
             composable(GpsRoutes.HABITS) { HabitsListScreen({ navController.navigate(GpsRoutes.habitEditor()) }, { navController.navigate(GpsRoutes.habitEditor(it)) }) }
