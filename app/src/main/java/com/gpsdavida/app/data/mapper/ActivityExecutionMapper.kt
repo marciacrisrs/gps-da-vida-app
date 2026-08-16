@@ -1,6 +1,7 @@
 package com.gpsdavida.app.data.mapper
 
 import com.gpsdavida.app.data.local.ActivityExecutionEntity
+import com.gpsdavida.app.domain.model.ActivityExecution
 import com.gpsdavida.app.domain.model.ActivityInstance
 import com.gpsdavida.app.domain.model.ActivityInstanceId
 import com.gpsdavida.app.domain.model.ActivityStatus
@@ -16,7 +17,7 @@ fun ActivityInstance.toExecutionEntity(): ActivityExecutionEntity = ActivityExec
     actualEnd = actual?.end?.toString(),
 )
 
-fun ActivityExecutionEntity.toActivityExecution(): ActivityExecution = ActivityExecution(
+fun ActivityExecutionEntity.toDomain(): ActivityExecution = ActivityExecution(
     activityInstanceId = ActivityInstanceId(activityInstanceId),
     status = ActivityStatus.valueOf(status),
     planned = TimeRange(Instant.parse(plannedStart), Instant.parse(plannedEnd)),
@@ -25,11 +26,4 @@ fun ActivityExecutionEntity.toActivityExecution(): ActivityExecution = ActivityE
     } else {
         null
     },
-)
-
-data class ActivityExecution(
-    val activityInstanceId: ActivityInstanceId,
-    val status: ActivityStatus,
-    val planned: TimeRange,
-    val actual: TimeRange?,
 )
