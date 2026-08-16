@@ -9,13 +9,17 @@ import com.gpsdavida.app.domain.model.RoutineId
 import com.gpsdavida.app.domain.port.RoutineRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 
 class RoomRoutineRepository @Inject constructor(
     private val dao: RoutineDao,
 ) : RoutineRepository {
-    override fun observeAll(): Flow<List<Routine>> = dao.observeAll().map { rows ->
-        rows.map { it.toDomain(dao.getSteps(it.id)) }
+    override fun observeAll(): Flow<List<Routine>> = combine(
+        dao.observeAll(),
+        dao.observeAllSteps(),
+    ) { rows, steps ->
+        val stepsByRoutine = steps.groupBy { it.routineId }
+        rows.map { it.toDomain(stepsByRoutine[it.id].orEmpty()) }
     }
 
     override suspend fun getById(id: RoutineId): Routine? =
