@@ -6,6 +6,7 @@ import com.gpsdavida.app.domain.model.Availability
 import com.gpsdavida.app.domain.model.AvailabilityKind
 import com.gpsdavida.app.domain.model.Dependency
 import com.gpsdavida.app.domain.model.Energy
+import com.gpsdavida.app.domain.model.ExecutionContext
 import com.gpsdavida.app.domain.model.Flexibility
 import com.gpsdavida.app.domain.model.NextActionContext
 import com.gpsdavida.app.domain.model.NextActionDecision
@@ -37,6 +38,7 @@ class ChooseNextActivity @Inject constructor() {
             .asSequence()
             .filter { it.status == ActivityStatus.PENDING }
             .filter { isAvailable(it, context) }
+            .filter { matchesContext(it, context.currentContext) }
             .filter { dependenciesSatisfied(it, activities, context.dependencies) }
             .toList()
 
@@ -54,6 +56,14 @@ class ChooseNextActivity @Inject constructor() {
             current = current,
             next = next,
         )
+    }
+
+    private fun matchesContext(
+        activity: ActivityInstance,
+        currentContext: ExecutionContext?,
+    ): Boolean {
+        if (currentContext == null || activity.contexts.isEmpty()) return true
+        return currentContext in activity.contexts
     }
 
     private fun isAvailable(
