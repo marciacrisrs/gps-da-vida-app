@@ -105,19 +105,25 @@ class GenerateDailySchedule @Inject constructor() {
         for (window in windows) {
             var cursor = window.start.atDate(date, zoneId)
             val windowEnd = window.end.atDate(date, zoneId)
+            var previous: ActivityInstance? = null
 
             for (existing in occupied) {
-                if (existing.planned.end <= cursor) continue
+                if (existing.planned.end <= cursor) {
+                    previous = existing
+                    continue
+                }
                 if (existing.planned.start >= windowEnd) break
 
-                val candidate = fitAfter(cursor, existing, activity, defaultBuffer, travelTimes)
+                val candidate = cursorAfter(previous, cursor, activity, defaultBuffer, travelTimes)
                 if (candidate.plus(duration) <= existing.planned.start && candidate.plus(duration) <= windowEnd) {
                     return TimeRange(candidate, candidate.plus(duration))
                 }
+
                 cursor = maxOf(cursor, existing.planned.end.plus(bufferAfter(existing, defaultBuffer)))
+                previous = existing
             }
 
-            val candidate = cursor
+            val candidate = cursorAfter(previous, cursor, activity, defaultBuffer, travelTimes)
             if (candidate.plus(duration) <= windowEnd) {
                 return TimeRange(candidate, candidate.plus(duration))
             }
@@ -125,16 +131,18 @@ class GenerateDailySchedule @Inject constructor() {
         return null
     }
 
-    private fun fitAfter(
+    private fun cursorAfter(
+        previous: ActivityInstance?,
         cursor: Instant,
-        existing: ActivityInstance,
         target: ActivityInstance,
         defaultBuffer: Duration,
         travelTimes: List<TravelTime>,
     ): Instant {
-        if (existing.planned.end <= cursor) return cursor
-        val travel = travelDuration(existing, target, travelTimes)
-        return maxOf(cursor, existing.planned.end.plus(bufferAfter(existing, defaultBuffer)).plus(travel))
+        if (previous == null) return cursor
+        val afterPrevious = previous.planned.end
+            .plus(bufferAfter(previous, defaultBuffer))
+            .plus(travelDuration(previous, target, travelTimes))
+        return maxOf(cursor, afterPrevious)
     }
 
     private fun availableWindows(
