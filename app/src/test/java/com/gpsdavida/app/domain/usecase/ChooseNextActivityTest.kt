@@ -203,7 +203,7 @@ class ChooseNextActivityTest {
             contexts = setOf(ExecutionContext.COMPUTER),
         )
 
-        val decision = useCase(listOf(computer), NextActionContext(now = now))
+        val decision = useCase(listOf(computer), NextActionContext(now))
 
         assertEquals(computer.id, decision.recommended?.id)
     }
@@ -314,6 +314,70 @@ class ChooseNextActivityTest {
         assertEquals(Duration.ZERO, decision.travelDurationToNext)
     }
 
+    @Test
+    fun `default buffer makes a future activity non executable`() {
+        val current = activity("current", "09:30:00", "10:30:00", Priority.IMPORTANT)
+        val next = activity("next", "10:40:00", "11:10:00", Priority.REQUIRED)
+
+        val decision = useCase(
+            listOf(current, next),
+            NextActionContext(now = now, defaultBuffer = Duration.ofMinutes(15)),
+        )
+
+        assertEquals(null, decision.next)
+    }
+
+    @Test
+    fun `per activity buffer overrides default buffer`() {
+        val current = activity(
+            "current",
+            "09:30:00",
+            "10:30:00",
+            Priority.IMPORTANT,
+            bufferAfter = Duration.ofMinutes(5),
+        )
+        val next = activity("next", "10:40:00", "11:10:00", Priority.REQUIRED)
+
+        val decision = useCase(
+            listOf(current, next),
+            NextActionContext(now = now, defaultBuffer = Duration.ofMinutes(15)),
+        )
+
+        assertEquals(next.id, decision.next?.id)
+    }
+
+    @Test
+    fun `buffer combines with travel time`() {
+        val current = activity(
+            id = "current",
+            start = "09:30:00",
+            end = "10:30:00",
+            priority = Priority.IMPORTANT,
+            location = Location(LocationId("home"), "Casa"),
+            bufferAfter = Duration.ofMinutes(10),
+        )
+        val next = activity(
+            id = "next",
+            start = "10:45:00",
+            end = "11:15:00",
+            priority = Priority.REQUIRED,
+            location = Location(LocationId("office"), "Trabalho"),
+        )
+
+        val decision = useCase(
+            listOf(current, next),
+            NextActionContext(
+                now = now,
+                travelTimes = listOf(
+                    TravelTime(LocationId("home"), LocationId("office"), Duration.ofMinutes(5)),
+                ),
+            ),
+        )
+
+        assertEquals(next.id, decision.next?.id)
+        assertEquals(Duration.ofMinutes(5), decision.travelDurationToNext)
+    }
+
     private fun activity(
         id: String,
         start: String,
@@ -322,6 +386,7 @@ class ChooseNextActivityTest {
         energy: Energy? = null,
         contexts: Set<ExecutionContext> = emptySet(),
         location: Location? = null,
+        bufferAfter: Duration? = null,
     ): ActivityInstance {
         val startInstant = Instant.parse("2026-08-17T${start}Z")
         val endInstant = Instant.parse("2026-08-17T${end}Z")
@@ -334,6 +399,7 @@ class ChooseNextActivityTest {
             energy = energy,
             contexts = contexts,
             location = location,
+            bufferAfter = bufferAfter,
         )
     }
 }
