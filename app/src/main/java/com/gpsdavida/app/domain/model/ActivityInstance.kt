@@ -11,6 +11,7 @@ data class ActivityInstance(
     val energy: Energy? = null,
     val contexts: Set<ExecutionContext> = emptySet(),
     val location: Location? = null,
+    val bufferAfter: Duration? = null,
     val actual: TimeRange? = null,
     val status: ActivityStatus = ActivityStatus.PENDING,
 ) {
