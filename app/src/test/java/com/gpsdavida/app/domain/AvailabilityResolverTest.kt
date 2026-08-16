@@ -7,14 +7,14 @@ import com.gpsdavida.app.domain.model.LocalTimeWindow
 import com.gpsdavida.app.domain.usecase.ResolveAvailableWindows
 import java.time.DayOfWeek
 import java.time.LocalTime
-import kotlin.test.Test
-import kotlin.test.assertEquals
+import org.junit.Assert.assertEquals
+import org.junit.Test
 
 class AvailabilityResolverTest {
     private val resolver = ResolveAvailableWindows()
 
     @Test
-    fun `blocked interval is subtracted from free interval`() {
+    fun blockedIntervalIsSubtractedFromFreeInterval() {
         val result = resolver(
             listOf(
                 rule("free", "08:00", "18:00", AvailabilityKind.FREE),
@@ -32,7 +32,7 @@ class AvailabilityResolverTest {
     }
 
     @Test
-    fun `overlapping blocked intervals are fully excluded`() {
+    fun overlappingBlockedIntervalsAreFullyExcluded() {
         val result = resolver(
             listOf(
                 rule("free", "08:00", "18:00", AvailabilityKind.FREE),
