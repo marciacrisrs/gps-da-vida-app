@@ -31,6 +31,8 @@ import com.gpsdavida.app.ui.events.EventsListScreen
 import com.gpsdavida.app.ui.habits.HabitFormScreen
 import com.gpsdavida.app.ui.habits.HabitsListScreen
 import com.gpsdavida.app.ui.meudia.MeuDiaScreen
+import com.gpsdavida.app.ui.routines.RoutineFormScreen
+import com.gpsdavida.app.ui.routines.RoutinesListScreen
 import com.gpsdavida.app.ui.tasks.TaskFormScreen
 import com.gpsdavida.app.ui.tasks.TasksListScreen
 
@@ -40,56 +42,25 @@ fun GpsNavHost() {
     val backStack by navController.currentBackStackEntryAsState()
     val currentRoute = backStack?.destination?.route
     val showBar = currentRoute in setOf(
-        GpsRoutes.AGORA,
-        GpsRoutes.MEU_DIA,
-        GpsRoutes.EVENTS,
-        GpsRoutes.TASKS,
-        GpsRoutes.HABITS,
+        GpsRoutes.AGORA, GpsRoutes.MEU_DIA, GpsRoutes.EVENTS,
+        GpsRoutes.TASKS, GpsRoutes.HABITS, GpsRoutes.ROUTINES,
     )
 
     Scaffold(
         bottomBar = {
             if (showBar) {
                 NavigationBar {
-                    NavigationBarItem(
-                        selected = currentRoute == GpsRoutes.AGORA,
-                        onClick = { navController.navigateToTab(GpsRoutes.AGORA) },
-                        icon = { Icon(Icons.Filled.Home, contentDescription = null) },
-                        label = { Text(stringResource(R.string.nav_agora)) },
-                    )
-                    NavigationBarItem(
-                        selected = currentRoute == GpsRoutes.MEU_DIA,
-                        onClick = { navController.navigateToTab(GpsRoutes.MEU_DIA) },
-                        icon = { Icon(Icons.Filled.DateRange, contentDescription = null) },
-                        label = { Text(stringResource(R.string.nav_meu_dia)) },
-                    )
-                    NavigationBarItem(
-                        selected = currentRoute == GpsRoutes.EVENTS,
-                        onClick = { navController.navigateToTab(GpsRoutes.EVENTS) },
-                        icon = { Icon(Icons.Filled.List, contentDescription = null) },
-                        label = { Text(stringResource(R.string.nav_eventos)) },
-                    )
-                    NavigationBarItem(
-                        selected = currentRoute == GpsRoutes.TASKS,
-                        onClick = { navController.navigateToTab(GpsRoutes.TASKS) },
-                        icon = { Icon(Icons.Filled.Check, contentDescription = null) },
-                        label = { Text(stringResource(R.string.nav_tarefas)) },
-                    )
-                    NavigationBarItem(
-                        selected = currentRoute == GpsRoutes.HABITS,
-                        onClick = { navController.navigateToTab(GpsRoutes.HABITS) },
-                        icon = { Icon(Icons.Filled.Favorite, contentDescription = null) },
-                        label = { Text(stringResource(R.string.nav_habitos)) },
-                    )
+                    NavigationBarItem(currentRoute == GpsRoutes.AGORA, { navController.navigateToTab(GpsRoutes.AGORA) }, { Icon(Icons.Filled.Home, null) }, label = { Text(stringResource(R.string.nav_agora)) })
+                    NavigationBarItem(currentRoute == GpsRoutes.MEU_DIA, { navController.navigateToTab(GpsRoutes.MEU_DIA) }, { Icon(Icons.Filled.DateRange, null) }, label = { Text(stringResource(R.string.nav_meu_dia)) })
+                    NavigationBarItem(currentRoute == GpsRoutes.EVENTS, { navController.navigateToTab(GpsRoutes.EVENTS) }, { Icon(Icons.Filled.List, null) }, label = { Text(stringResource(R.string.nav_eventos)) })
+                    NavigationBarItem(currentRoute == GpsRoutes.TASKS, { navController.navigateToTab(GpsRoutes.TASKS) }, { Icon(Icons.Filled.Check, null) }, label = { Text(stringResource(R.string.nav_tarefas)) })
+                    NavigationBarItem(currentRoute == GpsRoutes.HABITS, { navController.navigateToTab(GpsRoutes.HABITS) }, { Icon(Icons.Filled.Favorite, null) }, label = { Text(stringResource(R.string.nav_habitos)) })
+                    NavigationBarItem(currentRoute == GpsRoutes.ROUTINES, { navController.navigateToTab(GpsRoutes.ROUTINES) }, { Icon(Icons.Filled.List, null) }, label = { Text(stringResource(R.string.nav_rotinas)) })
                 }
             }
         },
     ) { padding ->
-        NavHost(
-            navController = navController,
-            startDestination = GpsRoutes.AGORA,
-            modifier = Modifier.padding(padding),
-        ) {
+        NavHost(navController, GpsRoutes.AGORA, Modifier.padding(padding)) {
             composable(GpsRoutes.AGORA) { AgoraScreen() }
             composable(GpsRoutes.MEU_DIA) {
                 MeuDiaScreen(
@@ -99,42 +70,14 @@ fun GpsNavHost() {
                     onOpenHabit = { id -> navController.navigate(GpsRoutes.habitEditor(id)) },
                 )
             }
-            composable(GpsRoutes.EVENTS) {
-                EventsListScreen(
-                    onAdd = { navController.navigate(GpsRoutes.eventEditor()) },
-                    onOpen = { id -> navController.navigate(GpsRoutes.eventEditor(id)) },
-                )
-            }
-            composable(GpsRoutes.TASKS) {
-                TasksListScreen(
-                    onAdd = { navController.navigate(GpsRoutes.taskEditor()) },
-                    onOpen = { id -> navController.navigate(GpsRoutes.taskEditor(id)) },
-                )
-            }
-            composable(GpsRoutes.HABITS) {
-                HabitsListScreen(
-                    onAdd = { navController.navigate(GpsRoutes.habitEditor()) },
-                    onOpen = { id -> navController.navigate(GpsRoutes.habitEditor(id)) },
-                )
-            }
-            composable(
-                route = GpsRoutes.EVENT_EDITOR,
-                arguments = listOf(navArgument("eventId") { type = NavType.StringType }),
-            ) {
-                EventFormScreen(onDone = { navController.popBackStack() })
-            }
-            composable(
-                route = GpsRoutes.TASK_EDITOR,
-                arguments = listOf(navArgument("taskId") { type = NavType.StringType }),
-            ) {
-                TaskFormScreen(onDone = { navController.popBackStack() })
-            }
-            composable(
-                route = GpsRoutes.HABIT_EDITOR,
-                arguments = listOf(navArgument("habitId") { type = NavType.StringType }),
-            ) {
-                HabitFormScreen(onDone = { navController.popBackStack() })
-            }
+            composable(GpsRoutes.EVENTS) { EventsListScreen({ navController.navigate(GpsRoutes.eventEditor()) }, { navController.navigate(GpsRoutes.eventEditor(it)) }) }
+            composable(GpsRoutes.TASKS) { TasksListScreen({ navController.navigate(GpsRoutes.taskEditor()) }, { navController.navigate(GpsRoutes.taskEditor(it)) }) }
+            composable(GpsRoutes.HABITS) { HabitsListScreen({ navController.navigate(GpsRoutes.habitEditor()) }, { navController.navigate(GpsRoutes.habitEditor(it)) }) }
+            composable(GpsRoutes.ROUTINES) { RoutinesListScreen({ navController.navigate(GpsRoutes.routineEditor()) }, { navController.navigate(GpsRoutes.routineEditor(it)) }) }
+            composable(GpsRoutes.EVENT_EDITOR, arguments = listOf(navArgument("eventId") { type = NavType.StringType })) { EventFormScreen { navController.popBackStack() } }
+            composable(GpsRoutes.TASK_EDITOR, arguments = listOf(navArgument("taskId") { type = NavType.StringType })) { TaskFormScreen { navController.popBackStack() } }
+            composable(GpsRoutes.HABIT_EDITOR, arguments = listOf(navArgument("habitId") { type = NavType.StringType })) { HabitFormScreen { navController.popBackStack() } }
+            composable(GpsRoutes.ROUTINE_EDITOR, arguments = listOf(navArgument("routineId") { type = NavType.StringType })) { RoutineFormScreen { navController.popBackStack() } }
         }
     }
 }
