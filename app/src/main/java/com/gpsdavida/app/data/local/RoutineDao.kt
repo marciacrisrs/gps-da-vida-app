@@ -11,6 +11,9 @@ abstract class RoutineDao {
     @Query("SELECT * FROM routines ORDER BY title")
     abstract fun observeAll(): Flow<List<RoutineEntity>>
 
+    @Query("SELECT * FROM routine_steps ORDER BY routineId, stepOrder")
+    abstract fun observeAllSteps(): Flow<List<RoutineStepEntity>>
+
     @Query("SELECT * FROM routines WHERE id = :id")
     abstract suspend fun getById(id: String): RoutineEntity?
 
