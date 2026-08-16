@@ -51,12 +51,12 @@ class ChooseNextActivityTest {
     @Test
     fun `blocked availability makes an activity non executable`() {
         val blocked = activity("blocked", "10:30:00", "11:00:00", Priority.REQUIRED)
-        val free = activity("free", "11:00:00", "11:30:00", Priority.IMPORTANT)
+        val free = activity("free", "10:00:00", "10:30:00", Priority.IMPORTANT)
         val availability = listOf(
             Availability(
                 id = AvailabilityId("a1"),
                 dayOfWeek = DayOfWeek.MONDAY,
-                window = LocalTimeWindow(LocalTime.of(10, 0), LocalTime.of(11, 0)),
+                window = LocalTimeWindow(LocalTime.of(10, 0), LocalTime.of(10, 30)),
                 kind = AvailabilityKind.FREE,
             ),
             Availability(
@@ -73,7 +73,7 @@ class ChooseNextActivityTest {
         )
 
         assertEquals(free.id, decision.recommended?.id)
-        assertNull(decision.current)
+        assertEquals(free.id, decision.current?.id)
     }
 
     @Test
@@ -121,7 +121,7 @@ class ChooseNextActivityTest {
         end: String,
         priority: Priority,
     ): ActivityInstance {
-        val startInstant = Instant.parse("2026-08-17T$start".replace(":", ":"))
+        val startInstant = Instant.parse("2026-08-17T$start")
         val endInstant = Instant.parse("2026-08-17T$end")
         return ActivityInstance(
             id = ActivityInstanceId(id),
