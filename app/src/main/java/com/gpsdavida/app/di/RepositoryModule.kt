@@ -2,9 +2,11 @@ package com.gpsdavida.app.di
 
 import com.gpsdavida.app.data.RoomEventRepository
 import com.gpsdavida.app.data.RoomHabitRepository
+import com.gpsdavida.app.data.RoomRoutineRepository
 import com.gpsdavida.app.data.RoomTaskRepository
 import com.gpsdavida.app.domain.port.EventRepository
 import com.gpsdavida.app.domain.port.HabitRepository
+import com.gpsdavida.app.domain.port.RoutineRepository
 import com.gpsdavida.app.domain.port.TaskRepository
 import dagger.Binds
 import dagger.Module
@@ -26,4 +28,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindHabitRepository(impl: RoomHabitRepository): HabitRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindRoutineRepository(impl: RoomRoutineRepository): RoutineRepository
 }
