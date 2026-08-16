@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlayArrow
@@ -35,10 +34,6 @@ import com.gpsdavida.app.ui.theme.GpsDaVidaColors
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-/**
- * Presentation-only state for the next-action surface.
- * Planning decisions belong to the domain; this component only renders them.
- */
 data class NextActionUiModel(
     val title: String,
     val durationMinutes: Long? = null,
@@ -48,12 +43,7 @@ data class NextActionUiModel(
     val state: NextActionState = NextActionState.Ready,
 )
 
-enum class NextActionState {
-    Ready,
-    InProgress,
-    Completed,
-    Empty,
-}
+enum class NextActionState { Ready, InProgress, Completed, Empty }
 
 @Composable
 fun NextActionCard(
@@ -72,13 +62,7 @@ fun NextActionCard(
         when (model.state) {
             NextActionState.Empty -> EmptyContent()
             NextActionState.Completed -> CompletedContent(model.title)
-            NextActionState.Ready, NextActionState.InProgress -> ReadyContent(
-                model = model,
-                onStart = onStart,
-                onSnooze = onSnooze,
-                onComplete = onComplete,
-                onSwap = onSwap,
-            )
+            NextActionState.Ready, NextActionState.InProgress -> ReadyContent(model, onStart, onSnooze, onComplete, onSwap)
         }
     }
 }
@@ -96,17 +80,9 @@ private fun ReadyContent(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         NextLabel()
-
-        Text(
-            text = model.title,
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.SemiBold,
-        )
-
+        Text(model.title, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.SemiBold)
         MetadataRow(model)
-
         Spacer(modifier = Modifier.size(4.dp))
-
         Button(
             onClick = if (model.state == NextActionState.Ready) onStart else onComplete,
             modifier = Modifier.fillMaxWidth(),
@@ -116,28 +92,18 @@ private fun ReadyContent(
                 contentDescription = null,
             )
             Spacer(modifier = Modifier.size(8.dp))
-            Text(
-                text = stringResource(
-                    if (model.state == NextActionState.Ready) R.string.next_action_start else R.string.next_action_complete,
-                ),
-            )
+            Text(stringResource(if (model.state == NextActionState.Ready) R.string.next_action_start else R.string.next_action_complete))
         }
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             OutlinedButton(onClick = onSnooze) {
-                Icon(Icons.Filled.AccessTime, contentDescription = null)
-                Spacer(modifier = Modifier.size(4.dp))
                 Text(stringResource(R.string.next_action_snooze))
             }
             IconButton(onClick = onSwap) {
-                Icon(
-                    imageVector = Icons.Filled.MoreVert,
-                    contentDescription = stringResource(R.string.next_action_swap),
-                )
+                Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.next_action_swap))
             }
         }
     }
@@ -145,63 +111,29 @@ private fun ReadyContent(
 
 @Composable
 private fun MetadataRow(model: NextActionUiModel) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        model.scheduledTime?.let { time ->
-            MetadataItem(
-                icon = Icons.Filled.AccessTime,
-                text = time.format(DateTimeFormatter.ofPattern("HH:mm")),
-                tint = GpsDaVidaColors.TerracottaDark,
-            )
+    Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
+        model.scheduledTime?.let {
+            MetadataItem(it.format(DateTimeFormatter.ofPattern("HH:mm")), GpsDaVidaColors.TerracottaDark)
         }
-        model.durationMinutes?.let { minutes ->
-            MetadataItem(
-                icon = Icons.Filled.AccessTime,
-                text = stringResource(R.string.next_action_duration, minutes),
-                tint = GpsDaVidaColors.Warning,
-            )
+        model.durationMinutes?.let {
+            MetadataItem(stringResource(R.string.next_action_duration, it), GpsDaVidaColors.Warning)
         }
-        model.priorityLabel?.let { priority ->
-            MetadataItem(
-                icon = Icons.Filled.Star,
-                text = priority,
-                tint = GpsDaVidaColors.Rose,
-            )
-        }
-        model.contextLabel?.let { context ->
-            MetadataItem(
-                icon = Icons.Filled.MoreVert,
-                text = context,
-                tint = GpsDaVidaColors.Sage,
-            )
-        }
+        model.priorityLabel?.let { MetadataItem(it, GpsDaVidaColors.Rose) }
+        model.contextLabel?.let { MetadataItem(it, GpsDaVidaColors.Sage) }
     }
 }
 
 @Composable
-private fun MetadataItem(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String, tint: Color) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        Icon(imageVector = icon, contentDescription = null, tint = tint, modifier = Modifier.size(16.dp))
-        Text(text = text, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-    }
+private fun MetadataItem(text: String, color: Color) {
+    Text(text, style = MaterialTheme.typography.labelLarge, color = color)
 }
 
 @Composable
 private fun NextLabel() {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Icon(
-            imageVector = Icons.Filled.Star,
-            contentDescription = null,
-            tint = GpsDaVidaColors.Terracotta,
-            modifier = Modifier.size(20.dp),
-        )
+        Icon(Icons.Filled.Star, contentDescription = null, tint = GpsDaVidaColors.Terracotta, modifier = Modifier.size(20.dp))
         Text(
-            text = stringResource(R.string.next_action_label),
+            stringResource(R.string.next_action_label),
             style = MaterialTheme.typography.labelLarge,
             color = GpsDaVidaColors.TerracottaDark,
             fontWeight = FontWeight.Bold,
@@ -211,22 +143,10 @@ private fun NextLabel() {
 
 @Composable
 private fun EmptyContent() {
-    Column(
-        modifier = Modifier.padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        Icon(
-            imageVector = Icons.Filled.Check,
-            contentDescription = null,
-            tint = GpsDaVidaColors.Sage,
-            modifier = Modifier.size(28.dp),
-        )
+    Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Icon(Icons.Filled.Check, contentDescription = null, tint = GpsDaVidaColors.Sage, modifier = Modifier.size(28.dp))
         Text(stringResource(R.string.next_action_empty_title), style = MaterialTheme.typography.headlineSmall)
-        Text(
-            stringResource(R.string.next_action_empty_body),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        Text(stringResource(R.string.next_action_empty_body), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
@@ -238,12 +158,10 @@ private fun CompletedContent(title: String) {
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Icon(
-            imageVector = Icons.Filled.Check,
+            Icons.Filled.Check,
             contentDescription = null,
             tint = GpsDaVidaColors.Success,
-            modifier = Modifier
-                .size(44.dp)
-                .clip(CircleShape),
+            modifier = Modifier.size(44.dp).clip(CircleShape),
         )
         Column {
             Text(stringResource(R.string.next_action_completed_label), style = MaterialTheme.typography.labelLarge, color = GpsDaVidaColors.Success)
