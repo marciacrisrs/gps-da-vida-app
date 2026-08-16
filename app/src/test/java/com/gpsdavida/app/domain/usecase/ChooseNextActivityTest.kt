@@ -19,7 +19,6 @@ import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalTime
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Test
 
 class ChooseNextActivityTest {
@@ -121,8 +120,8 @@ class ChooseNextActivityTest {
         end: String,
         priority: Priority,
     ): ActivityInstance {
-        val startInstant = Instant.parse("2026-08-17T$start")
-        val endInstant = Instant.parse("2026-08-17T$end")
+        val startInstant = Instant.parse("2026-08-17T${start}Z")
+        val endInstant = Instant.parse("2026-08-17T${end}Z")
         return ActivityInstance(
             id = ActivityInstanceId(id),
             source = ActivitySource.FromTask(TaskId(id)),
