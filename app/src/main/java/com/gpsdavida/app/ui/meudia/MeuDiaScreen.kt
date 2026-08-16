@@ -4,9 +4,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -29,11 +31,21 @@ fun MeuDiaScreen(
     onOpenEvent: (String) -> Unit,
     onOpenTask: (String) -> Unit,
     onOpenHabit: (String) -> Unit,
+    onOpenAvailability: () -> Unit,
     viewModel: MeuDiaViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     Scaffold(
-        topBar = { TopAppBar(title = { Text(stringResource(R.string.nav_meu_dia)) }) },
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.nav_meu_dia)) },
+                actions = {
+                    IconButton(onClick = onOpenAvailability) {
+                        Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.cd_availability))
+                    }
+                },
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddEvent) {
                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.cd_add_event))
@@ -43,44 +55,22 @@ fun MeuDiaScreen(
         val empty = state.events.isEmpty() && state.tasks.isEmpty() && state.habits.isEmpty()
         Column(modifier = Modifier.padding(padding)) {
             if (empty) {
-                Text(
-                    text = stringResource(R.string.meu_dia_empty),
-                    modifier = Modifier.padding(24.dp),
-                )
+                Text(stringResource(R.string.meu_dia_empty), modifier = Modifier.padding(24.dp))
             } else {
                 if (state.events.isNotEmpty()) {
-                    Text(
-                        text = stringResource(R.string.nav_eventos),
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    )
-                    state.events.forEach { event ->
-                        EventRow(event = event, onClick = { onOpenEvent(event.id.value) })
-                    }
+                    Text(stringResource(R.string.nav_eventos), modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+                    state.events.forEach { event -> EventRow(event = event, onClick = { onOpenEvent(event.id.value) }) }
                 }
                 if (state.tasks.isNotEmpty()) {
-                    Text(
-                        text = stringResource(R.string.nav_tarefas),
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    )
+                    Text(stringResource(R.string.nav_tarefas), modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
                     state.tasks.forEach { task ->
-                        TaskRow(
-                            task = task,
-                            onClick = { onOpenTask(task.id.value) },
-                            onToggleDone = { viewModel.setTaskDone(task.id.value, it) },
-                        )
+                        TaskRow(task = task, onClick = { onOpenTask(task.id.value) }, onToggleDone = { viewModel.setTaskDone(task.id.value, it) })
                     }
                 }
                 if (state.habits.isNotEmpty()) {
-                    Text(
-                        text = stringResource(R.string.nav_habitos),
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    )
+                    Text(stringResource(R.string.nav_habitos), modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
                     state.habits.forEach { habitDay ->
-                        HabitDayRow(
-                            item = habitDay,
-                            onClick = { onOpenHabit(habitDay.habit.id.value) },
-                            onToggleDone = { viewModel.setHabitDone(habitDay.habit.id.value, it) },
-                        )
+                        HabitDayRow(item = habitDay, onClick = { onOpenHabit(habitDay.habit.id.value) }, onToggleDone = { viewModel.setHabitDone(habitDay.habit.id.value, it) })
                     }
                 }
             }
