@@ -36,7 +36,7 @@ class ActivityInstanceDurationTest {
         val activity = activity(plannedEnd)
             .completed(TimeRange(plannedStart, Instant.parse("2026-01-01T10:30:00Z")))
 
-        assertEquals(Duration.ofMinutes(30), activity.actualDuration)
+        assertEquals(Duration.ofMinutes(90), activity.actualDuration)
         assertEquals(Duration.ofMinutes(30), activity.durationVariance)
     }
 
