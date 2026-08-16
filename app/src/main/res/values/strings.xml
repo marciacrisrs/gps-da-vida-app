@@ -4,10 +4,12 @@
     <string name="nav_meu_dia">Meu Dia</string>
     <string name="nav_eventos">Eventos</string>
     <string name="nav_tarefas">Tarefas</string>
+    <string name="nav_habitos">Hábitos</string>
     <string name="agora_placeholder">A rota do dia aparece aqui.</string>
-    <string name="meu_dia_empty">Nada para hoje. Cadastre um evento ou uma tarefa com prazo.</string>
+    <string name="meu_dia_empty">Nada para hoje. Cadastre um evento, uma tarefa com prazo ou um hábito.</string>
     <string name="events_empty">Nenhum evento cadastrado.</string>
     <string name="tasks_empty">Nenhuma tarefa cadastrada.</string>
+    <string name="habits_empty">Nenhum hábito cadastrado.</string>
     <string name="event_new">Novo evento</string>
     <string name="event_edit">Editar evento</string>
     <string name="event_title">Título</string>
@@ -23,6 +25,7 @@
     <string name="event_invalid_range">O fim deve ser depois do início.</string>
     <string name="cd_add_event">Adicionar evento</string>
     <string name="cd_add_task">Adicionar tarefa</string>
+    <string name="cd_add_habit">Adicionar hábito</string>
     <string name="cd_back">Voltar</string>
     <string name="task_new">Nova tarefa</string>
     <string name="task_edit">Editar tarefa</string>
@@ -43,6 +46,21 @@
     <string name="task_save">Salvar</string>
     <string name="task_delete">Excluir</string>
     <string name="task_delete_confirm">Excluir esta tarefa?</string>
+    <string name="habit_new">Novo hábito</string>
+    <string name="habit_edit">Editar hábito</string>
+    <string name="habit_title">Título</string>
+    <string name="habit_title_required">Informe um título.</string>
+    <string name="habit_frequency">Frequência</string>
+    <string name="habit_frequency_hint">Nenhum dia marcado = todos os dias.</string>
+    <string name="habit_every_day">Todos os dias</string>
+    <string name="habit_days_count">%1$d dias/semana</string>
+    <string name="habit_window">Janela do dia</string>
+    <string name="habit_window_start">Início %1$s</string>
+    <string name="habit_window_end">Fim %1$s</string>
+    <string name="habit_window_invalid">O fim da janela deve ser depois do início.</string>
+    <string name="habit_save">Salvar</string>
+    <string name="habit_delete">Excluir</string>
+    <string name="habit_delete_confirm">Excluir este hábito?</string>
     <string name="day_mon">Seg</string>
     <string name="day_tue">Ter</string>
     <string name="day_wed">Qua</string>

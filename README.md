@@ -8,4 +8,4 @@ App Android offline-first: rota do dia e “o que faço agora?”.
 
 Abrir a pasta no Android Studio, sync Gradle, rodar no emulador (`com.gpsdavida.app`).
 
-Próximo: hábitos — issue [#4](https://github.com/marciacrisrs/gps-da-vida-app/issues/4).
+Próximo: rotinas — issue [#5](https://github.com/marciacrisrs/gps-da-vida-app/issues/5).

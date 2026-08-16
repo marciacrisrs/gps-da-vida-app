@@ -5,6 +5,8 @@ import androidx.room.Room
 import com.gpsdavida.app.data.local.AppMetaDao
 import com.gpsdavida.app.data.local.EventDao
 import com.gpsdavida.app.data.local.GpsDatabase
+import com.gpsdavida.app.data.local.HabitCompletionDao
+import com.gpsdavida.app.data.local.HabitDao
 import com.gpsdavida.app.data.local.TaskDao
 import dagger.Module
 import dagger.Provides
@@ -32,4 +34,11 @@ object DatabaseModule {
 
     @Provides
     fun provideTaskDao(database: GpsDatabase): TaskDao = database.taskDao()
+
+    @Provides
+    fun provideHabitDao(database: GpsDatabase): HabitDao = database.habitDao()
+
+    @Provides
+    fun provideHabitCompletionDao(database: GpsDatabase): HabitCompletionDao =
+        database.habitCompletionDao()
 }

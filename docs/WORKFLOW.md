@@ -6,7 +6,7 @@
 
 1. **#18** — esqueleto (feito)
 2. **#1** — modelo de domínio (feito)
-3. Cadastros **#2–#3** (feito) → **#4–#8**
+3. Cadastros **#2–#4** (feito) → **#5–#8**
 4. Motor **#9–#12** e **#16** (regras, agenda, “agora”, recálculo, atraso)
 5. UI **#13–#15** (Agora, Meu Dia, conclusão)
 
