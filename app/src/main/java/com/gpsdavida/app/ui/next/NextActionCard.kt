@@ -9,14 +9,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Flag
-import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.SwapHoriz
-import androidx.compose.material.icons.filled.TaskAlt
-import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -38,7 +35,6 @@ import com.gpsdavida.app.ui.theme.GpsDaVidaColors
 import com.gpsdavida.app.ui.theme.GpsDaVidaSpacing
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 /**
  * Presentation-only state for the next-action surface.
@@ -134,13 +130,13 @@ private fun ReadyContent(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             OutlinedButton(onClick = onSnooze) {
-                Icon(Icons.Filled.Schedule, contentDescription = null)
+                Icon(Icons.Filled.AccessTime, contentDescription = null)
                 Spacer(modifier = Modifier.size(GpsDaVidaSpacing.Xs))
                 Text(stringResource(R.string.next_action_snooze))
             }
             IconButton(onClick = onSwap) {
                 Icon(
-                    imageVector = Icons.Filled.SwapHoriz,
+                    imageVector = Icons.Filled.MoreVert,
                     contentDescription = stringResource(R.string.next_action_swap),
                 )
             }
@@ -156,28 +152,28 @@ private fun MetadataRow(model: NextActionUiModel) {
     ) {
         model.scheduledTime?.let { time ->
             MetadataItem(
-                icon = Icons.Filled.Schedule,
+                icon = Icons.Filled.AccessTime,
                 text = time.format(DateTimeFormatter.ofPattern("HH:mm")),
                 tint = GpsDaVidaColors.TerracottaDark,
             )
         }
         model.durationMinutes?.let { minutes ->
             MetadataItem(
-                icon = Icons.Filled.Bolt,
+                icon = Icons.Filled.AccessTime,
                 text = stringResource(R.string.next_action_duration, minutes),
                 tint = GpsDaVidaColors.Warning,
             )
         }
         model.priorityLabel?.let { priority ->
             MetadataItem(
-                icon = Icons.Filled.Flag,
+                icon = Icons.Filled.Star,
                 text = priority,
                 tint = GpsDaVidaColors.Rose,
             )
         }
         model.contextLabel?.let { context ->
             MetadataItem(
-                icon = Icons.Filled.MoreHoriz,
+                icon = Icons.Filled.MoreVert,
                 text = context,
                 tint = GpsDaVidaColors.Sage,
             )
@@ -200,7 +196,7 @@ private fun MetadataItem(icon: androidx.compose.ui.graphics.vector.ImageVector, 
 private fun NextLabel() {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(GpsDaVidaSpacing.Sm)) {
         Icon(
-            imageVector = Icons.Filled.TaskAlt,
+            imageVector = Icons.Filled.Star,
             contentDescription = null,
             tint = GpsDaVidaColors.Terracotta,
             modifier = Modifier.size(20.dp),
@@ -221,7 +217,7 @@ private fun EmptyContent() {
         verticalArrangement = Arrangement.spacedBy(GpsDaVidaSpacing.Md),
     ) {
         Icon(
-            imageVector = Icons.Filled.TaskAlt,
+            imageVector = Icons.Filled.Check,
             contentDescription = null,
             tint = GpsDaVidaColors.Sage,
             modifier = Modifier.size(28.dp),
