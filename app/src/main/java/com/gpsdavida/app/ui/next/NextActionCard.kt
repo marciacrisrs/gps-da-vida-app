@@ -32,7 +32,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.gpsdavida.app.R
 import com.gpsdavida.app.ui.theme.GpsDaVidaColors
-import com.gpsdavida.app.ui.theme.GpsDaVidaSpacing
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
@@ -93,8 +92,8 @@ private fun ReadyContent(
     onSwap: () -> Unit,
 ) {
     Column(
-        modifier = Modifier.padding(GpsDaVidaSpacing.Xxl),
-        verticalArrangement = Arrangement.spacedBy(GpsDaVidaSpacing.Md),
+        modifier = Modifier.padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         NextLabel()
 
@@ -106,7 +105,7 @@ private fun ReadyContent(
 
         MetadataRow(model)
 
-        Spacer(modifier = Modifier.size(GpsDaVidaSpacing.Xs))
+        Spacer(modifier = Modifier.size(4.dp))
 
         Button(
             onClick = if (model.state == NextActionState.Ready) onStart else onComplete,
@@ -116,7 +115,7 @@ private fun ReadyContent(
                 imageVector = if (model.state == NextActionState.Ready) Icons.Filled.PlayArrow else Icons.Filled.Check,
                 contentDescription = null,
             )
-            Spacer(modifier = Modifier.size(GpsDaVidaSpacing.Sm))
+            Spacer(modifier = Modifier.size(8.dp))
             Text(
                 text = stringResource(
                     if (model.state == NextActionState.Ready) R.string.next_action_start else R.string.next_action_complete,
@@ -131,7 +130,7 @@ private fun ReadyContent(
         ) {
             OutlinedButton(onClick = onSnooze) {
                 Icon(Icons.Filled.AccessTime, contentDescription = null)
-                Spacer(modifier = Modifier.size(GpsDaVidaSpacing.Xs))
+                Spacer(modifier = Modifier.size(4.dp))
                 Text(stringResource(R.string.next_action_snooze))
             }
             IconButton(onClick = onSwap) {
@@ -147,7 +146,7 @@ private fun ReadyContent(
 @Composable
 private fun MetadataRow(model: NextActionUiModel) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(GpsDaVidaSpacing.Md),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         model.scheduledTime?.let { time ->
@@ -185,7 +184,7 @@ private fun MetadataRow(model: NextActionUiModel) {
 private fun MetadataItem(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String, tint: Color) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(GpsDaVidaSpacing.Xs),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Icon(imageVector = icon, contentDescription = null, tint = tint, modifier = Modifier.size(16.dp))
         Text(text = text, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -194,7 +193,7 @@ private fun MetadataItem(icon: androidx.compose.ui.graphics.vector.ImageVector, 
 
 @Composable
 private fun NextLabel() {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(GpsDaVidaSpacing.Sm)) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Icon(
             imageVector = Icons.Filled.Star,
             contentDescription = null,
@@ -213,8 +212,8 @@ private fun NextLabel() {
 @Composable
 private fun EmptyContent() {
     Column(
-        modifier = Modifier.padding(GpsDaVidaSpacing.Xxl),
-        verticalArrangement = Arrangement.spacedBy(GpsDaVidaSpacing.Md),
+        modifier = Modifier.padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Icon(
             imageVector = Icons.Filled.Check,
@@ -234,9 +233,9 @@ private fun EmptyContent() {
 @Composable
 private fun CompletedContent(title: String) {
     Row(
-        modifier = Modifier.padding(GpsDaVidaSpacing.Xxl),
+        modifier = Modifier.padding(24.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(GpsDaVidaSpacing.Md),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Icon(
             imageVector = Icons.Filled.Check,
