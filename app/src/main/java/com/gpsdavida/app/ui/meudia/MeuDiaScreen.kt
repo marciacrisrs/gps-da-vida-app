@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -119,13 +120,15 @@ fun MeuDiaScreen(
 
 @Composable
 private fun PlannerHeader() {
-    val today = LocalDate.now()
-    val formatter = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", Locale("pt", "BR"))
     Column(verticalArrangement = Arrangement.spacedBy(GpsDaVidaSpacing.Sm)) {
         Text("Meu dia", style = MaterialTheme.typography.displayLarge)
-        Text(today.format(formatter).replaceFirstChar { it.titlecase(Locale("pt", "BR")) }, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(formatPlannerDate(LocalDate.now()), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
+
+internal fun formatPlannerDate(date: LocalDate): String =
+    date.format(DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", Locale("pt", "BR")))
+        .replaceFirstChar { it.titlecase(Locale("pt", "BR")) }
 
 @Composable
 private fun DaySummary(events: Int, tasks: Int, habits: Int) {
