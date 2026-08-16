@@ -5,6 +5,7 @@ import com.gpsdavida.app.domain.model.ActivityStatus
 import com.gpsdavida.app.domain.model.Availability
 import com.gpsdavida.app.domain.model.AvailabilityKind
 import com.gpsdavida.app.domain.model.Dependency
+import com.gpsdavida.app.domain.model.Energy
 import com.gpsdavida.app.domain.model.Flexibility
 import com.gpsdavida.app.domain.model.NextActionContext
 import com.gpsdavida.app.domain.model.NextActionDecision
@@ -46,7 +47,7 @@ class ChooseNextActivity @Inject constructor() {
         val next = executable
             .asSequence()
             .filter { it.id != current?.id }
-            .sortedWith(nextComparator(context.now))
+            .sortedWith(nextComparator(context))
             .firstOrNull()
 
         return NextActionDecision(
@@ -104,11 +105,28 @@ class ChooseNextActivity @Inject constructor() {
     private val currentComparator = compareBy<ActivityInstance> { it.priority.weight }
         .thenBy { it.planned.start }
 
-    private fun nextComparator(now: Instant) = compareBy<ActivityInstance> { urgency(it, now) }
-        .thenBy { it.priority.weight }
-        .thenBy { it.flexibility != Flexibility.FIXED }
-        .thenBy { it.planned.start }
+    private fun nextComparator(context: NextActionContext) =
+        compareBy<ActivityInstance> { urgency(it, context.now) }
+            .thenBy { it.priority.weight }
+            .thenBy { energyPenalty(it.energy, context.currentEnergy) }
+            .thenBy { it.flexibility != Flexibility.FIXED }
+            .thenBy { it.planned.start }
 
     private fun urgency(activity: ActivityInstance, now: Instant): Int =
         if (activity.planned.start <= now) 0 else 1
+
+    /**
+     * Energy is a preference, not a hard constraint. A mandatory activity can
+     * still win when it requires more energy than the user currently has.
+     */
+    private fun energyPenalty(activityEnergy: Energy?, currentEnergy: Energy?): Int {
+        if (currentEnergy == null || activityEnergy == null) return 0
+
+        val distance = mapOf(
+            Energy.LOW to 0,
+            Energy.MEDIUM to 1,
+            Energy.HIGH to 2,
+        )
+        return kotlin.math.abs(distance.getValue(activityEnergy) - distance.getValue(currentEnergy))
+    }
 }

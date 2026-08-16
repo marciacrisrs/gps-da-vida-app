@@ -8,6 +8,7 @@ data class ActivityInstance(
     val flexibility: Flexibility,
     val planned: TimeRange,
     val priority: Priority = Priority.IMPORTANT,
+    val energy: Energy? = null,
     val actual: TimeRange? = null,
     val status: ActivityStatus = ActivityStatus.PENDING,
 ) {

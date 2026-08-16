@@ -9,6 +9,7 @@ import com.gpsdavida.app.domain.model.AvailabilityId
 import com.gpsdavida.app.domain.model.AvailabilityKind
 import com.gpsdavida.app.domain.model.Dependency
 import com.gpsdavida.app.domain.model.DependencyId
+import com.gpsdavida.app.domain.model.Energy
 import com.gpsdavida.app.domain.model.Flexibility
 import com.gpsdavida.app.domain.model.LocalTimeWindow
 import com.gpsdavida.app.domain.model.NextActionContext
@@ -114,11 +115,48 @@ class ChooseNextActivityTest {
         assertEquals(pending.id, decision.recommended?.id)
     }
 
+    @Test
+    fun `low current energy favors lower energy activity`() {
+        val high = activity("high", "11:00:00", "11:30:00", Priority.IMPORTANT, Energy.HIGH)
+        val low = activity("low", "11:30:00", "12:00:00", Priority.IMPORTANT, Energy.LOW)
+
+        val decision = useCase(
+            listOf(high, low),
+            NextActionContext(now = now, currentEnergy = Energy.LOW),
+        )
+
+        assertEquals(low.id, decision.recommended?.id)
+    }
+
+    @Test
+    fun `energy does not override mandatory priority`() {
+        val high = activity("high", "11:00:00", "11:30:00", Priority.REQUIRED, Energy.HIGH)
+        val low = activity("low", "11:30:00", "12:00:00", Priority.IMPORTANT, Energy.LOW)
+
+        val decision = useCase(
+            listOf(high, low),
+            NextActionContext(now = now, currentEnergy = Energy.LOW),
+        )
+
+        assertEquals(high.id, decision.recommended?.id)
+    }
+
+    @Test
+    fun `without current energy recommendation order remains unchanged`() {
+        val high = activity("high", "11:00:00", "11:30:00", Priority.IMPORTANT, Energy.HIGH)
+        val low = activity("low", "11:30:00", "12:00:00", Priority.IMPORTANT, Energy.LOW)
+
+        val decision = useCase(listOf(high, low), NextActionContext(now))
+
+        assertEquals(high.id, decision.recommended?.id)
+    }
+
     private fun activity(
         id: String,
         start: String,
         end: String,
         priority: Priority,
+        energy: Energy? = null,
     ): ActivityInstance {
         val startInstant = Instant.parse("2026-08-17T${start}Z")
         val endInstant = Instant.parse("2026-08-17T${end}Z")
@@ -128,6 +166,7 @@ class ChooseNextActivityTest {
             flexibility = Flexibility.FLEXIBLE,
             planned = TimeRange(startInstant, endInstant),
             priority = priority,
+            energy = energy,
         )
     }
 }
