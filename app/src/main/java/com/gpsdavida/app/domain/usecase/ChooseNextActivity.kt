@@ -8,7 +8,6 @@ import com.gpsdavida.app.domain.model.Dependency
 import com.gpsdavida.app.domain.model.Energy
 import com.gpsdavida.app.domain.model.ExecutionContext
 import com.gpsdavida.app.domain.model.Flexibility
-import com.gpsdavida.app.domain.model.LocationId
 import com.gpsdavida.app.domain.model.NextActionContext
 import com.gpsdavida.app.domain.model.NextActionDecision
 import java.time.Duration
@@ -36,18 +35,20 @@ class ChooseNextActivity @Inject constructor() {
         activities: List<ActivityInstance>,
         context: NextActionContext,
     ): NextActionDecision {
-        val executable = activities
+        val baseExecutable = activities
             .asSequence()
             .filter { it.status == ActivityStatus.PENDING }
             .filter { isAvailable(it, context) }
             .filter { matchesContext(it, context.currentContext) }
             .filter { dependenciesSatisfied(it, activities, context.dependencies) }
-            .filter { travelFitsBeforeStart(it, context, activities) }
             .toList()
 
-        val current = executable
+        val current = baseExecutable
             .filter { it.planned.start <= context.now && context.now < it.planned.end }
             .minWithOrNull(currentComparator)
+
+        val executable = baseExecutable
+            .filter { travelFitsBeforeStart(it, current, context) }
 
         val next = executable
             .asSequence()
@@ -111,15 +112,10 @@ class ChooseNextActivity @Inject constructor() {
 
     private fun travelFitsBeforeStart(
         activity: ActivityInstance,
+        current: ActivityInstance?,
         context: NextActionContext,
-        activities: List<ActivityInstance>,
     ): Boolean {
-        if (activity.planned.start <= context.now) return true
-
-        val current = activities
-            .filter { it.status == ActivityStatus.PENDING }
-            .filter { it.planned.start <= context.now && context.now < it.planned.end }
-            .minWithOrNull(currentComparator)
+        if (activity.id == current?.id || activity.planned.start <= context.now) return true
 
         val departure = current?.planned?.end ?: context.now
         val duration = travelDurationTo(activity, current, context)
