@@ -24,6 +24,18 @@ data class ActivityInstance(
     val durationVariance: Duration?
         get() = actualDuration?.minus(plannedDuration)
 
-    fun completed(actualRange: TimeRange): ActivityInstance =
-        copy(actual = actualRange, status = ActivityStatus.DONE)
+    fun completed(actualRange: TimeRange): ActivityInstance {
+        require(status == ActivityStatus.PENDING) { "Only pending activities can be completed" }
+        return copy(actual = actualRange, status = ActivityStatus.DONE)
+    }
+
+    fun skipped(): ActivityInstance {
+        require(status == ActivityStatus.PENDING) { "Only pending activities can be skipped" }
+        return copy(actual = null, status = ActivityStatus.SKIPPED)
+    }
+
+    fun deferred(): ActivityInstance {
+        require(status == ActivityStatus.PENDING) { "Only pending activities can be deferred" }
+        return copy(actual = null, status = ActivityStatus.DEFERRED)
+    }
 }
