@@ -1,6 +1,7 @@
 package com.gpsdavida.app.domain.usecase
 
 import com.gpsdavida.app.domain.model.ActivityInstance
+import com.gpsdavida.app.domain.model.ActivitySource
 import com.gpsdavida.app.domain.model.ActivityStatus
 import com.gpsdavida.app.domain.model.Availability
 import com.gpsdavida.app.domain.model.AvailabilityKind
@@ -62,7 +63,11 @@ class GenerateDailySchedule @Inject constructor() {
             )
 
         for (activity in flexible) {
-            if (!dependenciesSatisfied(activity, scheduled, dependencies)) {
+            val predecessors = dependencies
+                .filter { it.successor == activity.source }
+                .mapNotNull { dependency -> scheduled.firstOrNull { it.source == dependency.predecessor } }
+
+            if (predecessors.size != dependencies.count { it.successor == activity.source }) {
                 conflicts += ScheduleConflict(activity, ScheduleConflictReason.DEPENDENCY_NOT_SATISFIED)
                 continue
             }
@@ -75,6 +80,9 @@ class GenerateDailySchedule @Inject constructor() {
                 defaultBuffer = defaultBuffer,
                 travelTimes = travelTimes,
                 zoneId = zoneId,
+                earliestStart = predecessors.maxOfOrNull {
+                    it.planned.end.plus(bufferAfter(it, defaultBuffer)).plus(travelDuration(it, activity, travelTimes))
+                },
             )
 
             if (slot == null) {
@@ -98,13 +106,14 @@ class GenerateDailySchedule @Inject constructor() {
         defaultBuffer: Duration,
         travelTimes: List<TravelTime>,
         zoneId: ZoneId,
+        earliestStart: Instant? = null,
     ): TimeRange? {
         val windows = availableWindows(date, availability)
         val occupied = scheduled.sortedBy { it.planned.start }
         val duration = activity.plannedDuration
 
         for (window in windows) {
-            var cursor = window.start.atDate(date, zoneId)
+            var cursor = maxOf(window.start.atDate(date, zoneId), earliestStart ?: window.start.atDate(date, zoneId))
             val windowEnd = window.end.atDate(date, zoneId)
             var previous: ActivityInstance? = null
 
@@ -171,20 +180,10 @@ class GenerateDailySchedule @Inject constructor() {
         return result
     }
 
-    private fun dependenciesSatisfied(
-        activity: ActivityInstance,
-        scheduled: List<ActivityInstance>,
-        dependencies: List<Dependency>,
-    ): Boolean = dependencies
-        .filter { it.successor == activity.source }
-        .all { dependency ->
-            scheduled.any { it.source == dependency.predecessor }
-        }
-
     private fun dependencyDepth(
-        source: com.gpsdavida.app.domain.model.ActivitySource,
+        source: ActivitySource,
         dependencies: List<Dependency>,
-        visiting: Set<com.gpsdavida.app.domain.model.ActivitySource> = emptySet(),
+        visiting: Set<ActivitySource> = emptySet(),
     ): Int {
         if (source in visiting) return 0
         val predecessors = dependencies.filter { it.successor == source }.map { it.predecessor }
