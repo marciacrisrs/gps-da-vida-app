@@ -26,3 +26,6 @@ value class ActivityInstanceId(val value: String)
 
 @JvmInline
 value class DependencyId(val value: String)
+
+@JvmInline
+value class LocationId(val value: String)

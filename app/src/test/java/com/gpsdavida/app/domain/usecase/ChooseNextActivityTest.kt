@@ -13,11 +13,15 @@ import com.gpsdavida.app.domain.model.Energy
 import com.gpsdavida.app.domain.model.ExecutionContext
 import com.gpsdavida.app.domain.model.Flexibility
 import com.gpsdavida.app.domain.model.LocalTimeWindow
+import com.gpsdavida.app.domain.model.Location
+import com.gpsdavida.app.domain.model.LocationId
 import com.gpsdavida.app.domain.model.NextActionContext
 import com.gpsdavida.app.domain.model.Priority
 import com.gpsdavida.app.domain.model.TaskId
 import com.gpsdavida.app.domain.model.TimeRange
+import com.gpsdavida.app.domain.model.TravelTime
 import java.time.DayOfWeek
+import java.time.Duration
 import java.time.Instant
 import java.time.LocalTime
 import org.junit.Assert.assertEquals
@@ -204,6 +208,112 @@ class ChooseNextActivityTest {
         assertEquals(computer.id, decision.recommended?.id)
     }
 
+    @Test
+    fun `travel duration is exposed and next activity remains executable when there is enough time`() {
+        val current = activity(
+            id = "current",
+            start = "09:30:00",
+            end = "10:30:00",
+            priority = Priority.IMPORTANT,
+            location = Location(LocationId("home"), "Casa"),
+        )
+        val next = activity(
+            id = "next",
+            start = "10:45:00",
+            end = "11:15:00",
+            priority = Priority.IMPORTANT,
+            location = Location(LocationId("office"), "Trabalho"),
+        )
+
+        val decision = useCase(
+            listOf(current, next),
+            NextActionContext(
+                now = now,
+                travelTimes = listOf(
+                    TravelTime(LocationId("home"), LocationId("office"), Duration.ofMinutes(15)),
+                ),
+            ),
+        )
+
+        assertEquals(next.id, decision.next?.id)
+        assertEquals(Duration.ofMinutes(15), decision.travelDurationToNext)
+    }
+
+    @Test
+    fun `travel can make a future activity non executable`() {
+        val current = activity(
+            id = "current",
+            start = "09:30:00",
+            end = "10:30:00",
+            priority = Priority.IMPORTANT,
+            location = Location(LocationId("home"), "Casa"),
+        )
+        val next = activity(
+            id = "next",
+            start = "10:40:00",
+            end = "11:10:00",
+            priority = Priority.REQUIRED,
+            location = Location(LocationId("office"), "Trabalho"),
+        )
+
+        val decision = useCase(
+            listOf(current, next),
+            NextActionContext(
+                now = now,
+                travelTimes = listOf(
+                    TravelTime(LocationId("home"), LocationId("office"), Duration.ofMinutes(15)),
+                ),
+            ),
+        )
+
+        assertEquals(current.id, decision.recommended?.id)
+        assertEquals(null, decision.next)
+    }
+
+    @Test
+    fun `current location is used when there is no current activity`() {
+        val next = activity(
+            id = "next",
+            start = "10:30:00",
+            end = "11:00:00",
+            priority = Priority.IMPORTANT,
+            location = Location(LocationId("office"), "Trabalho"),
+        )
+
+        val decision = useCase(
+            listOf(next),
+            NextActionContext(
+                now = now,
+                currentLocation = LocationId("home"),
+                travelTimes = listOf(
+                    TravelTime(LocationId("home"), LocationId("office"), Duration.ofMinutes(30)),
+                ),
+            ),
+        )
+
+        assertEquals(next.id, decision.recommended?.id)
+        assertEquals(Duration.ofMinutes(30), decision.travelDurationToNext)
+    }
+
+    @Test
+    fun `without location travel does not change previous behavior`() {
+        val next = activity("next", "10:30:00", "11:00:00", Priority.IMPORTANT)
+
+        val decision = useCase(
+            listOf(next),
+            NextActionContext(
+                now = now,
+                currentLocation = LocationId("home"),
+                travelTimes = listOf(
+                    TravelTime(LocationId("home"), LocationId("office"), Duration.ofHours(1)),
+                ),
+            ),
+        )
+
+        assertEquals(next.id, decision.recommended?.id)
+        assertEquals(Duration.ZERO, decision.travelDurationToNext)
+    }
+
     private fun activity(
         id: String,
         start: String,
@@ -211,6 +321,7 @@ class ChooseNextActivityTest {
         priority: Priority,
         energy: Energy? = null,
         contexts: Set<ExecutionContext> = emptySet(),
+        location: Location? = null,
     ): ActivityInstance {
         val startInstant = Instant.parse("2026-08-17T${start}Z")
         val endInstant = Instant.parse("2026-08-17T${end}Z")
@@ -222,6 +333,7 @@ class ChooseNextActivityTest {
             priority = priority,
             energy = energy,
             contexts = contexts,
+            location = location,
         )
     }
 }
