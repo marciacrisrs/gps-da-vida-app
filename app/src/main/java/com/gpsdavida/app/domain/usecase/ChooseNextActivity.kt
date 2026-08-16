@@ -48,7 +48,7 @@ class ChooseNextActivity @Inject constructor() {
             .minWithOrNull(currentComparator)
 
         val executable = baseExecutable
-            .filter { travelFitsBeforeStart(it, current, context) }
+            .filter { travelAndBufferFitBeforeStart(it, current, context) }
 
         val next = executable
             .asSequence()
@@ -110,7 +110,7 @@ class ChooseNextActivity @Inject constructor() {
             }
         }
 
-    private fun travelFitsBeforeStart(
+    private fun travelAndBufferFitBeforeStart(
         activity: ActivityInstance,
         current: ActivityInstance?,
         context: NextActionContext,
@@ -118,8 +118,9 @@ class ChooseNextActivity @Inject constructor() {
         if (activity.id == current?.id || activity.planned.start <= context.now) return true
 
         val departure = current?.planned?.end ?: context.now
-        val duration = travelDurationTo(activity, current, context)
-        return departure.plus(duration) <= activity.planned.start
+        val travel = travelDurationTo(activity, current, context)
+        val buffer = current?.bufferAfter ?: context.defaultBuffer
+        return departure.plus(travel).plus(buffer) <= activity.planned.start
     }
 
     private fun travelDurationTo(
