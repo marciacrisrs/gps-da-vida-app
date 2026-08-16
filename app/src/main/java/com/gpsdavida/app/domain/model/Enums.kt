@@ -1,10 +1,10 @@
 package com.gpsdavida.app.domain.model
 
-enum class Priority {
-    REQUIRED,
-    IMPORTANT,
-    DESIRABLE,
-    LEISURE,
+enum class Priority(val weight: Int) {
+    REQUIRED(0),
+    IMPORTANT(1),
+    DESIRABLE(2),
+    LEISURE(3),
 }
 
 enum class Energy {
