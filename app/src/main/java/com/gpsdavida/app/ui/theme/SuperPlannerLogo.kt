@@ -1,6 +1,5 @@
 package com.gpsdavida.app.ui.theme
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gpsdavida.app.R
@@ -22,7 +22,7 @@ import com.gpsdavida.app.R
 @Composable
 fun SuperPlannerLogo(
     modifier: Modifier = Modifier,
-    iconSize: androidx.compose.ui.unit.Dp = 52.dp,
+    iconSize: Dp = 52.dp,
     showTagline: Boolean = false,
 ) {
     Row(
