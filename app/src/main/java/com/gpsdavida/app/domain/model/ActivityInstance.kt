@@ -7,6 +7,7 @@ data class ActivityInstance(
     val source: ActivitySource,
     val flexibility: Flexibility,
     val planned: TimeRange,
+    val priority: Priority = Priority.IMPORTANT,
     val actual: TimeRange? = null,
     val status: ActivityStatus = ActivityStatus.PENDING,
 ) {
