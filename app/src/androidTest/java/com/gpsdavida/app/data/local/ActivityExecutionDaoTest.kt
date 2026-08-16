@@ -46,7 +46,7 @@ class ActivityExecutionDaoTest {
 
         assertNotNull(loaded)
         assertEquals(ActivityStatus.DONE.name, loaded!!.status)
-        assertEquals(Instant.parse(entity.actualStart), Instant.parse(loaded.actualStart))
-        assertEquals(Instant.parse(entity.actualEnd), Instant.parse(loaded.actualEnd))
+        assertEquals(Instant.parse(requireNotNull(entity.actualStart)), Instant.parse(requireNotNull(loaded.actualStart)))
+        assertEquals(Instant.parse(requireNotNull(entity.actualEnd)), Instant.parse(requireNotNull(loaded.actualEnd)))
     }
 }
