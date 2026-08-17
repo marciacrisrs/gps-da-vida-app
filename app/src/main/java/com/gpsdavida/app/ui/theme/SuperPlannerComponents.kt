@@ -4,17 +4,22 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.semantics.progressBarRangeInfo
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 
 /** Reusable visual primitives for the Super Planner editorial language. */
@@ -30,6 +35,72 @@ fun SuperPlannerCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         content = content,
     )
+}
+
+@Composable
+fun SuperPlannerSectionHeader(
+    title: String,
+    modifier: Modifier = Modifier,
+    supportingText: String? = null,
+    actionLabel: String? = null,
+    onAction: (() -> Unit)? = null,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        androidx.compose.foundation.layout.Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                color = GpsDaVidaColors.Ink,
+            )
+            supportingText?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = GpsDaVidaColors.InkSoft,
+                )
+            }
+        }
+        if (actionLabel != null && onAction != null) {
+            androidx.compose.material3.TextButton(onClick = onAction) {
+                Text(actionLabel, style = MaterialTheme.typography.labelLarge)
+            }
+        }
+    }
+}
+
+@Composable
+fun SuperPlannerProgress(
+    progress: Float,
+    modifier: Modifier = Modifier,
+    label: String? = null,
+) {
+    val safeProgress = progress.coerceIn(0f, 1f)
+    androidx.compose.foundation.layout.Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        label?.let {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.labelMedium,
+                color = GpsDaVidaColors.InkSoft,
+            )
+        }
+        LinearProgressIndicator(
+            progress = { safeProgress },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(6.dp)
+                .semantics {
+                    progressBarRangeInfo = ProgressBarRangeInfo(safeProgress, 0f..1f)
+                },
+            color = GpsDaVidaColors.Terracotta,
+            trackColor = GpsDaVidaColors.Blush,
+        )
+    }
 }
 
 @Composable
