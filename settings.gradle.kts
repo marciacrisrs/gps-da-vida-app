@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "gps-da-vida-app"
+rootProject.name = "superplanner"
 include(":app")
