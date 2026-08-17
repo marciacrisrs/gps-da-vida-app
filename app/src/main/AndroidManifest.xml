@@ -8,7 +8,7 @@
         android:label="@string/app_name"
         android:roundIcon="@android:drawable/ic_dialog_info"
         android:supportsRtl="true"
-        android:theme="@style/Theme.GpsDaVida">
+        android:theme="@style/Theme.SuperPlanner">
         <activity
             android:name=".ui.MainActivity"
             android:exported="true"
