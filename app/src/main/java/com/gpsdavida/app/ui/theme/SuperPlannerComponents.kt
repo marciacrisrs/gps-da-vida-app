@@ -98,7 +98,7 @@ fun SuperPlannerProgress(
                     progressBarRangeInfo = ProgressBarRangeInfo(safeProgress, 0f..1f)
                 },
             color = GpsDaVidaColors.Terracotta,
-            trackColor = GpsDaVidaColors.Blush,
+            trackColor = GpsDaVidaColors.RoseSoft,
         )
     }
 }
