@@ -1,15 +1,15 @@
 ---
-description: GPS da Vida agent collaboration, skill governance, and work order (#17 then #18 then #1)
+description: Super Planner agent collaboration, skill governance, and work order
 alwaysApply: true
 ---
 
-# Colaboração GPS da Vida
+# Colaboração Super Planner
 
 Márcia decides product. The Android architect orchestrates. Other agents stay in their lane.
 
 ## Work order
 
-Architecture: [ADR 001](../../docs/adr/001-arquitetura-inicial.md). Domain: [ADR 002](../../docs/adr/002-modelo-de-dominio.md). Next: GitHub **#5** (routines).
+Architecture: [ADR 001](../../docs/adr/001-arquitetura-inicial.md). Domain: [ADR 002](../../docs/adr/002-modelo-de-dominio.md).
 
 ## Protocol
 
@@ -23,4 +23,4 @@ Never create a Cursor skill alone. Propose name, mission, when-to-use, must-not.
 
 ## Product defaults
 
-ADR 001: offline-first Android, Compose, Material 3, no backend. English code; Portuguese UI. Namespace `com.gpsdavida.app`.
+Offline-first Android, Compose, Material 3, no backend. English code; Portuguese UI. Product name: **Super Planner**. The historical name GPS da Vida must not be used for new product identifiers, classes, packages, documentation, or UI.
