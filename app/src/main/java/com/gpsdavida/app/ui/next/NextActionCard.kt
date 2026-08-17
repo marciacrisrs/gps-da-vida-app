@@ -10,11 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.gpsdavida.app.R
 import com.gpsdavida.app.ui.theme.GpsDaVidaColors
 import com.gpsdavida.app.ui.theme.SuperPlannerCard
+import com.gpsdavida.app.ui.theme.SuperPlannerMark
 import com.gpsdavida.app.ui.theme.SuperPlannerMetadata
 import com.gpsdavida.app.ui.theme.SuperPlannerPrimaryButton
 import com.gpsdavida.app.ui.theme.SuperPlannerSecondaryActions
@@ -86,19 +83,13 @@ private fun ReadyContent(
             text = stringResource(if (model.state == NextActionState.Ready) R.string.next_action_start else R.string.next_action_complete),
             onClick = if (model.state == NextActionState.Ready) onStart else onComplete,
         )
-        Row(
+        SuperPlannerSecondaryActions(
+            primaryText = stringResource(R.string.next_action_swap),
+            onPrimary = onSwap,
+            secondaryText = stringResource(R.string.next_action_snooze),
+            onSecondary = onSnooze,
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            SuperPlannerSecondaryActions(
-                primaryText = stringResource(R.string.next_action_swap),
-                onPrimary = onSwap,
-                secondaryText = stringResource(R.string.next_action_snooze),
-                onSecondary = onSnooze,
-                modifier = Modifier.weight(1f),
-            )
-        }
+        )
     }
 }
 
@@ -115,8 +106,11 @@ private fun MetadataRow(model: NextActionUiModel) {
 
 @Composable
 private fun NextLabel() {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Icon(Icons.Filled.Star, contentDescription = null, tint = GpsDaVidaColors.Terracotta, modifier = Modifier.size(18.dp))
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        SuperPlannerMark(size = 20.dp)
         Text(
             text = stringResource(R.string.next_action_label),
             style = MaterialTheme.typography.labelLarge,
