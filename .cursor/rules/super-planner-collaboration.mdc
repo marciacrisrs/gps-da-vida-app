@@ -1,0 +1,26 @@
+---
+description: Super Planner agent collaboration, skill governance, and work order
+alwaysApply: true
+---
+
+# Colaboração Super Planner
+
+Márcia decides product. The Android architect orchestrates. Other agents stay in their lane.
+
+## Work order
+
+Architecture: [ADR 001](../../docs/adr/001-arquitetura-inicial.md). Domain: [ADR 002](../../docs/adr/002-modelo-de-dominio.md).
+
+## Protocol
+
+Architect closes the contract → domain implements testable rules → app persists → UI observes state → tests cover acceptance → quality gates at batch end.
+
+- Domain: no Android. UI: no Room, no route recalculation. App: no planning rules in ViewModels.
+
+## New skills
+
+Never create a Cursor skill alone. Propose name, mission, when-to-use, must-not. Wait for Márcia’s OK, then write `SKILL.md`. Same ritual to merge, split, or drop a skill.
+
+## Product defaults
+
+Offline-first Android, Compose, Material 3, no backend. English code; Portuguese UI. Product name: **Super Planner**. The historical name GPS da Vida must not be used for new product identifiers, classes, packages, documentation, or UI.
