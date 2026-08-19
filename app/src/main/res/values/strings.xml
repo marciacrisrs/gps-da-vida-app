@@ -7,6 +7,7 @@
     <string name="nav_habitos">Hábitos</string>
     <string name="nav_rotinas">Rotinas</string>
     <string name="agora_placeholder">A rota do dia aparece aqui.</string>
+    <string name="agora_next">Depois: %1$s</string>
     <string name="meu_dia_empty">Nada para hoje. Cadastre um evento, uma tarefa com prazo ou um hábito.</string>
     <string name="events_empty">Nenhum evento cadastrado.</string><string name="tasks_empty">Nenhuma tarefa cadastrada.</string><string name="habits_empty">Nenhum hábito cadastrado.</string><string name="routines_empty">Nenhuma rotina cadastrada.</string>
     <string name="event_new">Novo evento</string><string name="event_edit">Editar evento</string><string name="event_title">Título</string><string name="event_start">Início</string><string name="event_end">Fim</string><string name="event_date">Data</string><string name="event_time">Hora</string><string name="event_recurrence">Repetir</string><string name="event_save">Salvar</string><string name="event_delete">Excluir</string><string name="event_delete_confirm">Excluir este evento?</string><string name="event_title_required">Informe um título.</string><string name="event_invalid_range">O fim deve ser depois do início.</string><string name="cd_add_event">Adicionar evento</string><string name="cd_add_task">Adicionar tarefa</string><string name="cd_add_habit">Adicionar hábito</string><string name="cd_back">Voltar</string>

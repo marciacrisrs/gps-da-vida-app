@@ -8,6 +8,8 @@ import com.gpsdavida.app.domain.model.ActivityInstance
 import com.gpsdavida.app.domain.model.ActivityInstanceId
 import com.gpsdavida.app.domain.port.ActivityExecutionRepository
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class RoomActivityExecutionRepository @Inject constructor(
     private val dao: ActivityExecutionDao,
@@ -18,4 +20,7 @@ class RoomActivityExecutionRepository @Inject constructor(
 
     override suspend fun getById(id: ActivityInstanceId): ActivityExecution? =
         dao.getById(id.value)?.toDomain()
+
+    override fun observeAll(): Flow<List<ActivityExecution>> =
+        dao.observeAll().map { rows -> rows.map { it.toDomain() } }
 }

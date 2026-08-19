@@ -24,19 +24,21 @@ import java.time.DayOfWeek
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalTime
+import java.time.ZoneOffset
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class ChooseNextActivityTest {
     private val useCase = ChooseNextActivity()
     private val now = Instant.parse("2026-08-17T10:00:00Z")
+    private val zone = ZoneOffset.UTC
 
     @Test
     fun `current activity is recommended before overdue activity`() {
         val overdue = activity("overdue", "08:00:00", "08:30:00", Priority.REQUIRED)
         val current = activity("current", "09:30:00", "10:30:00", Priority.IMPORTANT)
 
-        val decision = useCase(listOf(overdue, current), NextActionContext(now))
+        val decision = useCase(listOf(overdue, current), NextActionContext(now = now, zoneId = zone))
 
         assertEquals(current.id, decision.current?.id)
         assertEquals(overdue.id, decision.next?.id)
@@ -48,7 +50,7 @@ class ChooseNextActivityTest {
         val important = activity("important", "09:00:00", "09:30:00", Priority.IMPORTANT)
         val required = activity("required", "09:30:00", "09:45:00", Priority.REQUIRED)
 
-        val decision = useCase(listOf(important, required), NextActionContext(now))
+        val decision = useCase(listOf(important, required), NextActionContext(now = now, zoneId = zone))
 
         assertEquals(required.id, decision.recommended?.id)
     }
@@ -74,7 +76,7 @@ class ChooseNextActivityTest {
 
         val decision = useCase(
             listOf(blocked, free),
-            NextActionContext(now = now, availability = availability),
+            NextActionContext(now = now, zoneId = zone, availability = availability),
         )
 
         assertEquals(free.id, decision.recommended?.id)
@@ -93,14 +95,14 @@ class ChooseNextActivityTest {
 
         val blockedDecision = useCase(
             listOf(predecessor, successor),
-            NextActionContext(now = now, dependencies = listOf(dependency)),
+            NextActionContext(now = now, zoneId = zone, dependencies = listOf(dependency)),
         )
         assertEquals(predecessor.id, blockedDecision.recommended?.id)
 
         val completed = predecessor.copy(status = ActivityStatus.DONE)
         val unblockedDecision = useCase(
             listOf(completed, successor),
-            NextActionContext(now = now, dependencies = listOf(dependency)),
+            NextActionContext(now = now, zoneId = zone, dependencies = listOf(dependency)),
         )
         assertEquals(successor.id, unblockedDecision.recommended?.id)
     }
@@ -115,7 +117,7 @@ class ChooseNextActivityTest {
             .copy(status = ActivityStatus.DEFERRED)
         val pending = activity("pending", "11:00:00", "11:30:00", Priority.IMPORTANT)
 
-        val decision = useCase(listOf(done, skipped, deferred, pending), NextActionContext(now))
+        val decision = useCase(listOf(done, skipped, deferred, pending), NextActionContext(now = now, zoneId = zone))
 
         assertEquals(pending.id, decision.recommended?.id)
     }
@@ -127,7 +129,7 @@ class ChooseNextActivityTest {
 
         val decision = useCase(
             listOf(high, low),
-            NextActionContext(now = now, currentEnergy = Energy.LOW),
+            NextActionContext(now = now, zoneId = zone, currentEnergy = Energy.LOW),
         )
 
         assertEquals(low.id, decision.recommended?.id)
@@ -140,7 +142,7 @@ class ChooseNextActivityTest {
 
         val decision = useCase(
             listOf(high, low),
-            NextActionContext(now = now, currentEnergy = Energy.LOW),
+            NextActionContext(now = now, zoneId = zone, currentEnergy = Energy.LOW),
         )
 
         assertEquals(high.id, decision.recommended?.id)
@@ -151,7 +153,7 @@ class ChooseNextActivityTest {
         val high = activity("high", "11:00:00", "11:30:00", Priority.IMPORTANT, Energy.HIGH)
         val low = activity("low", "11:30:00", "12:00:00", Priority.IMPORTANT, Energy.LOW)
 
-        val decision = useCase(listOf(high, low), NextActionContext(now))
+        val decision = useCase(listOf(high, low), NextActionContext(now = now, zoneId = zone))
 
         assertEquals(high.id, decision.recommended?.id)
     }
@@ -175,7 +177,7 @@ class ChooseNextActivityTest {
 
         val decision = useCase(
             listOf(computer, home),
-            NextActionContext(now = now, currentContext = ExecutionContext.HOME),
+            NextActionContext(now = now, zoneId = zone, currentContext = ExecutionContext.HOME),
         )
 
         assertEquals(home.id, decision.recommended?.id)
@@ -187,7 +189,7 @@ class ChooseNextActivityTest {
 
         val decision = useCase(
             listOf(unrestricted),
-            NextActionContext(now = now, currentContext = ExecutionContext.OUTSIDE),
+            NextActionContext(now = now, zoneId = zone, currentContext = ExecutionContext.OUTSIDE),
         )
 
         assertEquals(unrestricted.id, decision.recommended?.id)
@@ -203,7 +205,7 @@ class ChooseNextActivityTest {
             contexts = setOf(ExecutionContext.COMPUTER),
         )
 
-        val decision = useCase(listOf(computer), NextActionContext(now))
+        val decision = useCase(listOf(computer), NextActionContext(now = now, zoneId = zone))
 
         assertEquals(computer.id, decision.recommended?.id)
     }
@@ -229,6 +231,7 @@ class ChooseNextActivityTest {
             listOf(current, next),
             NextActionContext(
                 now = now,
+                zoneId = zone,
                 travelTimes = listOf(
                     TravelTime(LocationId("home"), LocationId("office"), Duration.ofMinutes(15)),
                 ),
@@ -260,6 +263,7 @@ class ChooseNextActivityTest {
             listOf(current, next),
             NextActionContext(
                 now = now,
+                zoneId = zone,
                 travelTimes = listOf(
                     TravelTime(LocationId("home"), LocationId("office"), Duration.ofMinutes(15)),
                 ),
@@ -284,6 +288,7 @@ class ChooseNextActivityTest {
             listOf(next),
             NextActionContext(
                 now = now,
+                zoneId = zone,
                 currentLocation = LocationId("home"),
                 travelTimes = listOf(
                     TravelTime(LocationId("home"), LocationId("office"), Duration.ofMinutes(30)),
@@ -303,6 +308,7 @@ class ChooseNextActivityTest {
             listOf(next),
             NextActionContext(
                 now = now,
+                zoneId = zone,
                 currentLocation = LocationId("home"),
                 travelTimes = listOf(
                     TravelTime(LocationId("home"), LocationId("office"), Duration.ofHours(1)),
@@ -321,7 +327,7 @@ class ChooseNextActivityTest {
 
         val decision = useCase(
             listOf(current, next),
-            NextActionContext(now = now, defaultBuffer = Duration.ofMinutes(15)),
+            NextActionContext(now = now, zoneId = zone, defaultBuffer = Duration.ofMinutes(15)),
         )
 
         assertEquals(null, decision.next)
@@ -340,7 +346,7 @@ class ChooseNextActivityTest {
 
         val decision = useCase(
             listOf(current, next),
-            NextActionContext(now = now, defaultBuffer = Duration.ofMinutes(15)),
+            NextActionContext(now = now, zoneId = zone, defaultBuffer = Duration.ofMinutes(15)),
         )
 
         assertEquals(next.id, decision.next?.id)
@@ -368,6 +374,7 @@ class ChooseNextActivityTest {
             listOf(current, next),
             NextActionContext(
                 now = now,
+                zoneId = zone,
                 travelTimes = listOf(
                     TravelTime(LocationId("home"), LocationId("office"), Duration.ofMinutes(5)),
                 ),

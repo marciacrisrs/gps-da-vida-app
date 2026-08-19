@@ -12,6 +12,7 @@ import com.gpsdavida.app.domain.port.ActivityExecutionRepository
 import java.time.Duration
 import java.time.Instant
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.flow.Flow
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -83,5 +84,12 @@ class RecordActivityExecutionTest {
         override suspend fun getById(id: ActivityInstanceId): ActivityExecution? = saved?.let {
             ActivityExecution(it.id, it.status, it.planned, it.actual)
         }
+
+        override fun observeAll(): Flow<List<ActivityExecution>> =
+            kotlinx.coroutines.flow.flowOf(
+                saved?.let { ActivityExecution(it.id, it.status, it.planned, it.actual) }
+                    ?.let { listOf(it) }
+                    .orEmpty(),
+            )
     }
 }
