@@ -51,13 +51,14 @@ fun NextActionCard(
     onSnooze: () -> Unit = {},
     onComplete: () -> Unit = {},
     onSwap: () -> Unit = {},
+    oneTapComplete: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     SuperPlannerCard(modifier = modifier.fillMaxWidth()) {
         when (model.state) {
             NextActionState.Empty -> EmptyContent()
             NextActionState.Completed -> CompletedContent(model.title)
-            NextActionState.Ready, NextActionState.InProgress -> ReadyContent(model, onStart, onSnooze, onComplete, onSwap)
+            NextActionState.Ready, NextActionState.InProgress -> ReadyContent(model, onStart, onSnooze, onComplete, onSwap, oneTapComplete)
         }
     }
 }
@@ -69,6 +70,7 @@ private fun ReadyContent(
     onSnooze: () -> Unit,
     onComplete: () -> Unit,
     onSwap: () -> Unit,
+    oneTapComplete: Boolean,
 ) {
     Column(
         modifier = Modifier.padding(28.dp),
@@ -83,8 +85,14 @@ private fun ReadyContent(
         MetadataRow(model)
         Spacer(modifier = Modifier.size(2.dp))
         SuperPlannerPrimaryButton(
-            text = stringResource(if (model.state == NextActionState.Ready) R.string.next_action_start else R.string.next_action_complete),
-            onClick = if (model.state == NextActionState.Ready) onStart else onComplete,
+            text = stringResource(
+                if (oneTapComplete || model.state == NextActionState.InProgress) {
+                    R.string.next_action_complete
+                } else {
+                    R.string.next_action_start
+                },
+            ),
+            onClick = if (oneTapComplete || model.state == NextActionState.InProgress) onComplete else onStart,
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
